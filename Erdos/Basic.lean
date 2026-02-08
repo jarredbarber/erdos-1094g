@@ -46,10 +46,14 @@ lemma least_prime_factor_le_k_of_2k_le_n_lt_k2 (n k : ℕ) (h_nk : 2 * k ≤ n) 
     (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ k := by
   sorry
 
+set_option linter.style.nativeDecide false
+
 /-- Verification that the exceptions indeed exceed the bound. -/
 lemma exception_violation (n k : ℕ) (h : (n, k) ∈ Exceptions) :
     g n k > max (n / k) k := by
-  sorry
+  have h_all : ∀ p ∈ ExceptionsFinset, g p.1 p.2 > max (p.1 / p.2) p.2 := by
+    native_decide
+  exact h_all (n, k) h
 
 /-- The main result: Erdős 1094.
 For `n ≥ 2k`, the least prime factor of `n.choose k` is at most `max (n/k) k`,
