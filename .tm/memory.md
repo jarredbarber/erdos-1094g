@@ -42,3 +42,23 @@
 **Watch next**:
 - Completion of Case 1 verification.
 - Completion of Case 2 formalization (should reduce sorry count to 1).
+## Heartbeat — 2026-02-08 17:51 UTC
+
+**Metrics**: 
+- Sorry count: 1
+- Verified proofs: 4 (ecklund_case1.md added)
+- Task count: 17 closed, 1 open (formalize Case 1)
+
+**Status**: Final phase — closing the last sorry.
+
+**Observations**:
+- Task erdos1094g-2f8 (verify Case 1) succeeded.
+- Task erdos1094g-5i3 (formalize Case 2) succeeded, using an axiom for the EES 1974 result.
+- Only one sorry remains in Erdos/Basic.lean: least_prime_factor_le_k_of_n_ge_k2.
+
+**Actions**:
+- Created erdos1094g-7fl (formalize) to close the final sorry for Case 1 using proofs/ecklund_case1.md and an axiom for Ecklund 1969.
+
+**Watch next**:
+- Completion of erdos1094g-7fl.
+- Full compilation of the project.
