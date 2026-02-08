@@ -1,22 +1,21 @@
-## Heartbeat — 2026-02-08 20:53 UTC
+## Heartbeat — 2026-02-08 20:58 UTC
 
 **Metrics**: 
-- Sorry count: 3 (Sylvester axiom, Ecklund k>=3 sorry, EES k>=29 sorry)
-- Verified proofs: 4 (Old citation proofs) -> 3 new proofs pending verification
-- Task count: 3 verify tasks open
+- Sorry count: 3
+- Verified proofs: 6
+- Task count: 3 open/in_progress, 31 closed
 
-**Status**: Transitioning from Citation Axioms to First Principles. Verify tasks launched.
+**Status**: Phase 3: Formalizing New Proofs.
 
 **Observations**:
-- User poked about sorries/axioms. Responded by launching verification for the replacement proofs.
-- The project started with citation axioms to build a working skeleton (good practice).
-- `erdos1094g-f49` (Sylvester), `erdos1094g-t6i` (Ecklund), `erdos1094g-eqh` (EES) have just completed their exploration tasks, providing rigorous NL proofs to replace the axioms.
-- Created verify tasks `erdos1094g-aja`, `erdos1094g-9s8`, `erdos1094g-3kh` to review these new proofs.
-- Once verified, we will create formalize tasks to remove the axioms/sorries.
+- **Verified Proofs**: `proofs/ecklund_case1_proof.md` and `proofs/ees_case2_proof.md` were approved.
+- **Formalization Launched**: Created `erdos1094g-bw8` (Ecklund) and `erdos1094g-2il` (EES) to implement these proofs.
+- **Sylvester**: `erdos1094g-594` is revising the Sylvester proof. Once approved, we will formalize it.
+- The project is moving systematically to replace the 3 major axioms/sorries with rigorous code (or at least more granular, proven-as-much-as-possible code).
 
 **Actions**:
-- Created 3 verify tasks for the new rigorous proofs.
+- Created formalization tasks for Ecklund and EES.
 
 **Watch next**:
-- Completion of verify tasks.
-- Creation of formalize tasks to close the 3 remaining holes using the new proofs.
+- Progress on Sylvester revision.
+- Formalization progress.
