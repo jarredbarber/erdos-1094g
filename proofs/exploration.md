@@ -1,9 +1,10 @@
 # Prime Factorization Structure of C(n,k)
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
 **Statement:** For $n \ge 2k$, the least prime factor $P_{min}(\binom{n}{k}) \le \max(n/k, k)$ with finitely many exceptions.
 **Dependencies:** None
 **Confidence:** High
+**Reviewed by:** erdos1094g-znx
 
 ## Phase 1: Small Value Exploration
 
