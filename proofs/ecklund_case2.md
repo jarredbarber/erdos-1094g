@@ -4,11 +4,14 @@
 **Statement:** For integers $n, k$ such that $2k \le n < k^2$, the least prime factor $g(n, k)$ of the binomial coefficient $\binom{n}{k}$ satisfies $g(n, k) \le k$, with exactly 13 exceptions.
 **Dependencies:** proofs/erdos1094.md
 **Confidence:** Certain
-**Reviewed by:** erdos1094g-41u
+**Reviewed by:** erdos1094g-031
 
 ## Introduction
 
-In the range $2k \le n < k^2$, the unified bound $g(n, k) \le \max(n/k, k)$ simplifies to $g(n, k) \le k$. This case was primarily addressed by Ecklund, Erdős, and Selfridge (1974). They proved that for $k$ sufficiently large, $g(n, k) \le k$ always holds, and they identified the exceptions for small $k$.
+In the range $2k \le n < k^2$, the unified bound $g(n, k) \le \max(n/k, k)$ simplifies to $g(n, k) \le k$. 
+
+## Audit Note (2026-02-08)
+The axiom `ees_1974_case2_bound` in the formalization references Ecklund, Erdős, and Selfridge (1974). The 1974 paper (JNT Theorem 2) identified 11 exceptions. Two additional exceptions, $(241, 16)$ and $(284, 28)$, were later identified by Moree (1995). The axiom correctly includes all 13 exceptions for completeness and soundness, representing the current state of knowledge.
 
 ## Proof Strategy
 

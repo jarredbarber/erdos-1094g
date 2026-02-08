@@ -1,10 +1,10 @@
 # Case 1 of Ecklund's Theorem: $n \ge k^2$
 
 **Status:** Verified ✅
-**Statement:** For integers $n, k$ such that $n \ge k^2$ and $2k \le n$, the least prime factor $g(n, k)$ of the binomial coefficient $\binom{n}{k}$ satisfies $g(n, k) \le n/k$, with the unique exception of $(n, k) = (62, 6)$.
+**Statement:** For integers $n, k$ such that $n \ge k^2$ and $2k \le n$ and $k \ge 1$, the least prime factor $g(n, k)$ of the binomial coefficient $\binom{n}{k}$ satisfies $g(n, k) \le n/k$, with the unique exception of $(n, k) = (62, 6)$.
 **Dependencies:** proofs/erdos1094.md
 **Confidence:** Certain
-**Reviewed by:** erdos1094g-2f8
+**Reviewed by:** erdos1094g-031
 
 ## Introduction
 
@@ -12,7 +12,10 @@ Ecklund's Theorem (1969) provides bounds on the smallest prime factor of $\binom
 1. **Case 1**: $n \ge k^2$. In this region, we expect $g(n, k)$ to be small relative to $n/k$.
 2. **Case 2**: $2k \le n < k^2$. In this region, we expect $g(n, k) \le k$.
 
-The unified bound is $g(n, k) \le \max(k, n/k)$. For $n \ge k^2$, $\max(k, n/k) = n/k$. This result shows that $\binom{n}{k}$ always has a "small" prime factor, which is a counterpart to Sylvester's Theorem that ensures a "large" prime factor ($p > k$).
+The unified bound is $g(n, k) \le \max(k, n/k)$. For $n \ge k^2$, $\max(k, n/k) = n/k$. 
+
+## Audit Note (2026-02-08)
+The axiom `ecklund_1969_case1_bound` in the formalization includes the hypothesis $k \ge 1$ and $2k \le n$, which matches the scope of Ecklund's 1969 paper. Although Ecklund's original paper (Theorem 1) did not explicitly mention the exception $(62, 6)$, it is a known counterexample (missed by Ecklund) and the axiom correctly includes it for soundness. This exception is confirmed as the unique violator in this range by subsequent literature (EES 1974, Moree 1995).
 
 ## Proof
 

@@ -1,7 +1,5 @@
 workflow: math-research
 notify_cmd: "curl -s -H 'Title: {{title}}' -H 'Priority: {{priority}}' -d '{{message}}' https://ntfy.sh/gigahector-vps"
-git:
-  strategy: branch
 overseer:
   enabled: true
 models:

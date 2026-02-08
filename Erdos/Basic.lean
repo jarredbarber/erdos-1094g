@@ -28,10 +28,10 @@ def ExceptionsFinset : Finset (ℕ × ℕ) :=
 def Exceptions : Set (ℕ × ℕ) := ↑ExceptionsFinset
 
 /-- Sylvester's Theorem (J. J. Sylvester, 1892).
-For `n > k`, the product of `k` consecutive integers `n(n-1)...(n-k+1)`
+For `n ≥ 2k`, the product of `k` consecutive integers `n(n-1)...(n-k+1)`
 contains a prime factor `p > k`.
 This implies that `n.choose k` has a prime factor `p > k`. -/
-axiom sylvester_theorem (n k : ℕ) (h : k < n) :
+axiom sylvester_theorem (n k : ℕ) (h : 2 * k ≤ n) :
     ∃ p, p.Prime ∧ p ∣ (n.choose k) ∧ p > k
 
 /-- Ecklund's Theorem, Case 1: For `n ≥ k^2`, the least prime factor of `n.choose k`
@@ -58,7 +58,7 @@ def ExceptionsCase2 : Finset (ℕ × ℕ) :=
   {(7, 3), (13, 4), (14, 4), (23, 5), (44, 8), (46, 10), (47, 10),
    (74, 10), (94, 10), (95, 10), (47, 11), (241, 16), (284, 28)}
 
-/-- Ecklund, Erdős, Selfridge (1974), Theorem 2.
+/-- Ecklund, Erdős, Selfridge (1974), Theorem 2, supplemented by Moree (1995).
     For $2k \le n < k^2$, $g(n, k) \le k$ unless $(n, k)$ is one of the 13 exceptions. -/
 axiom ees_1974_case2_bound (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k2 : n < k * k)
     (h_not_exc : (n, k) ∉ ExceptionsCase2) : g n k ≤ k
