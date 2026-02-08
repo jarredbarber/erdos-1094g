@@ -1,21 +1,22 @@
 ## Heartbeat — 2026-02-08 20:53 UTC
 
 **Metrics**: 
-- Sorry count: 3 (Ecklund general case, Sylvester n>2k, EES general case)
-- Verified proofs: 4 (Old citation-based proofs)
-- Task count: 3 open/in_progress, 25 closed
+- Sorry count: 3 (Sylvester axiom, Ecklund k>=3 sorry, EES k>=29 sorry)
+- Verified proofs: 4 (Old citation proofs) -> 3 new proofs pending verification
+- Task count: 3 verify tasks open
 
-**Status**: Forward-Backward sync. Explore agents are writing new rigorous proofs to replace citation sorries.
+**Status**: Transitioning from Citation Axioms to First Principles. Verify tasks launched.
 
 **Observations**:
-- `erdos1094g-f49` is creating `proofs/sylvester.md` with Erdos's 1934 proof. The agent correctly identified that the axiom in `Erdos/Sylvester.lean` was flawed (used $n>k$ instead of $n \ge 2k$ or similar bounds) and corrected it to $2k \le n$, which matches the `sylvester_theorem` constraint.
-- `erdos1094g-t6i` and `erdos1094g-eqh` are just starting.
-- The project is in a good state: compilation succeeds (with 3 sorries), and we are systematically replacing the "citation axioms" with "proofs from first principles".
+- User poked about sorries/axioms. Responded by launching verification for the replacement proofs.
+- The project started with citation axioms to build a working skeleton (good practice).
+- `erdos1094g-f49` (Sylvester), `erdos1094g-t6i` (Ecklund), `erdos1094g-eqh` (EES) have just completed their exploration tasks, providing rigorous NL proofs to replace the axioms.
+- Created verify tasks `erdos1094g-aja`, `erdos1094g-9s8`, `erdos1094g-3kh` to review these new proofs.
+- Once verified, we will create formalize tasks to remove the axioms/sorries.
 
 **Actions**:
-- No intervention needed. The explore agents are working correctly.
+- Created 3 verify tasks for the new rigorous proofs.
 
 **Watch next**:
-- Completion of `erdos1094g-f49` (Sylvester proof).
-- Review of `proofs/sylvester.md`.
-- Once verified, creating a formalize task to replace `axiom sylvester_schur_theorem` with a real proof.
+- Completion of verify tasks.
+- Creation of formalize tasks to close the 3 remaining holes using the new proofs.

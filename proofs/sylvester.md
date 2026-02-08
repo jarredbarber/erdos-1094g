@@ -1,9 +1,16 @@
 # Sylvester-Schur Theorem
 
-**Status:** Draft ✏️
-**Statement:** For any integers $n, k$ with $n \ge 2k$, the binomial coefficient $\binom{n}{k}$ has a prime factor $p > k$.
+**Status:** Under review 🔍
+**Statement:** For any integers $n, k$ with $n \ge 2k$ and $k \ge 1$, the binomial coefficient $\binom{n}{k}$ has a prime factor $p > k$.
 **Dependencies:** None (Self-contained or relies on standard bounds)
-**Confidence:** High
+**Confidence:** Moderate
+
+## Review Notes (erdos1094g-aja)
+
+1.  **Incomplete for $n > 2k$**: The proof currently follows the standard Erdős proof of Bertrand's Postulate, but this approach does not directly conclude Sylvester-Schur for $n > k^2$. The inequality $k (\ln n - \ln(4k)) \le \sqrt{n} \ln n$ is satisfied for all sufficiently large $n$, so it doesn't provide the required contradiction.
+2.  **Section 4/5 Gaps**: These sections are largely outlines. Section 5 "Case B" relies on external citations without providing the mathematical argument.
+3.  **Large $n$ logic**: For $n \ge k^2$, a different bounding argument is needed (e.g., showing that $\binom{n}{k}$ is too large to only have prime factors $\le k$). Specifically, $\binom{n}{k} > n^{\pi(k)}$ for large $n$.
+4.  **Recommendation**: Revision requested to fill these gaps. Focus on the Erdős (1934) argument for $n \ge 2k$.
 
 ## Introduction
 
