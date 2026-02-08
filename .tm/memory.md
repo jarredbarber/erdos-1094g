@@ -1,22 +1,29 @@
-## Heartbeat — 2026-02-08 19:58 UTC
+## Heartbeat — 2026-02-08 20:45 UTC
 
 **Metrics**: 
-- Sorry count: 2 (Ecklund general case, Sylvester n>2k) + 1 citation axiom (EES)
-- Verified proofs: 4
-- Task count: 3 open/in_progress, 22 closed
+- Sorry count: 3 (Ecklund general case, Sylvester n>2k, EES general case) — *Note: These are currently handled by axioms/sorries that need replacement.*
+- Verified proofs: 4 (Old citation-based proofs)
+- Task count: 3 open, 25 closed
 
-**Status**: Phase 2: Removing citation axioms. Ecklund is now a theorem (with sorry), Sylvester is a theorem (with sorry).
+**Status**: Reopened. Pivot to proof-from-scratch.
 
 **Observations**:
-- `erdos1094g-mzm` successfully replaced the `ecklund_1969_case1_bound` axiom in `Erdos/Basic.lean` with a theorem importing `Erdos.Ecklund`.
-- `Erdos/Ecklund.lean` proves the $k=1, 2$ cases but has a `sorry` for the general case ($k \ge 3$).
-- `erdos1094g-luj` is open to fix the Sylvester sorry ($n > 2k$).
-- `erdos1094g-r7a` is open to formalize EES (Case 2).
-- The "axiom" count is effectively down to 1 (EES), but the "sorry" count is up as axioms are converted to theorems with holes. This is good progress towards a fully formalized proof.
+- **CRITICAL**: Human rejected citation axioms ("incorrectly stated literature results so need to be proven").
+- The project is no longer considered complete.
+- I must replace the 3 citation axioms with formal proofs (or Mathlib imports):
+    1.  Sylvester-Schur ($n > k \implies \exists p > k, p \mid \binom{n}{k}$).
+    2.  Ecklund Case 1 ($n \ge k^2 \implies g(n,k) \le n/k$).
+    3.  EES Case 2 ($2k \le n < k^2 \implies g(n,k) \le k$).
 
 **Actions**:
-- No intervention needed. Tasks are queued and progressing.
+- Updated `README.md` to remove "Phase 2 Complete" and mark the project as "In Progress".
+- Created 3 `explore` tasks to prove these theorems rigorously (or find them in Mathlib):
+    - `erdos1094g-f49`: Sylvester-Schur
+    - `erdos1094g-t6i`: Ecklund Case 1
+    - `erdos1094g-eqh`: EES Case 2
+- The goal is to produce verified NL proofs first, then formalize them without using `axiom`.
 
 **Watch next**:
-- Completion of `erdos1094g-mzm`.
-- Pick up of `erdos1094g-luj` and `erdos1094g-r7a`.
+- Results of the `explore` tasks.
+- If Sylvester-Schur is in Mathlib, that task will close quickly.
+- Ecklund and EES will likely require substantial proof effort.

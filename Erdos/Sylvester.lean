@@ -9,10 +9,10 @@ namespace Erdos1094
 open Nat
 
 /-- Sylvester-Schur Theorem (J. J. Sylvester, 1892; I. Schur, 1929).
-    For n > k, the binomial coefficient n.choose k has a prime factor p > k.
+    For n ≥ 2k, the binomial coefficient n.choose k has a prime factor p > k.
     This generalizes Bertrand's Postulate (which is the case n = 2k).
     Not yet in Mathlib as of 2026. -/
-axiom sylvester_schur_theorem (n k : ℕ) (h : n > k) :
+axiom sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) :
     ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k
 
 /-- Sylvester's Theorem (J. J. Sylvester, 1892).
@@ -56,6 +56,6 @@ theorem sylvester_theorem (n k : ℕ) (h : 2 * k ≤ n) (hk : 0 < k) :
       k = 1 * k := (one_mul k).symm
       _ < 2 * k := mul_lt_mul_of_pos_right one_lt_two hk
       _ < n := h_gt
-    exact sylvester_schur_theorem n k h_nk
+    exact sylvester_schur_theorem n k (le_of_lt h_gt)
 
 end Erdos1094
