@@ -40,11 +40,28 @@ lemma least_prime_factor_le_k_of_n_ge_k2 (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k
     (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ k := by
   sorry
 
+/-- The exceptions for Case 2 ($2k \le n < k^2$) identified by EES 1974. -/
+def ExceptionsCase2 : Finset (ℕ × ℕ) :=
+  {(7, 3), (13, 4), (14, 4), (23, 5), (44, 8), (46, 10), (47, 10),
+   (74, 10), (94, 10), (95, 10), (47, 11), (241, 16), (284, 28)}
+
+/-- Ecklund, Erdős, Selfridge (1974), Theorem 2.
+    For $2k \le n < k^2$, $g(n, k) \le k$ unless $(n, k)$ is one of the 13 exceptions. -/
+axiom ees_1974_case2_bound (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k2 : n < k * k)
+    (h_not_exc : (n, k) ∉ ExceptionsCase2) : g n k ≤ k
+
 /-- Ecklund's Theorem, Case 2: For `2k ≤ n < k^2`, the least prime factor of `n.choose k`
 is at most `k`, except for the specified exceptions. -/
 lemma least_prime_factor_le_k_of_2k_le_n_lt_k2 (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k2 : n < k * k)
     (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ k := by
-  sorry
+  apply ees_1974_case2_bound n k h_nk h_n_k2
+  intro h_in
+  apply h_not_exc
+  rw [Exceptions, Finset.mem_coe]
+  refine Finset.mem_of_subset ?_ h_in
+  decide
+
+
 
 set_option linter.style.nativeDecide false
 
