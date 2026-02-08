@@ -5,9 +5,9 @@ git:
 overseer:
   enabled: true
 models:
-  heavy: google-antigravity/gemini-3-pro:high
-  medium: google-antigravity/gemini-3-pro:high
-  light: google-antigravity/gemini-3-pro:high
+  heavy: google-antigravity/gemini-3-pro-high:high
+  medium: google-antigravity/gemini-3-flash:high
+  light: google-antigravity/gemini-3-flash:medium
 defaults:
   priority: 2
   size: medium
