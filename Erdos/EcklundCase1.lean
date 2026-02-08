@@ -3,6 +3,8 @@ import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Algebra.BigOperators.Associated
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.Ring
@@ -21,27 +23,138 @@ lemma smooth_mul_rough (n B : ℕ) (hn : n ≠ 0) : smoothPart n B * roughPart n
   sorry
 
 lemma roughPart_gt_B (n B : ℕ) (h : roughPart n B > 1) : roughPart n B > B := by
+  have hn : n ≠ 0 := by
+    intro hn_eq
+    rw [hn_eq, roughPart] at h
+    simp at h
   have exists_prime : ∃ p, p.Prime ∧ p ∣ roughPart n B := 
     Nat.exists_prime_and_dvd (_root_.ne_of_gt h)
   rcases exists_prime with ⟨p, hp, hp_dvd⟩
   have p_gt_B : B < p := by
-    sorry
+    rw [roughPart, Finsupp.prod] at hp_dvd
+    have h_prime := hp.prime
+    rw [Prime.dvd_finset_prod_iff h_prime] at hp_dvd
+    rcases hp_dvd with ⟨q, hq, hq_dvd⟩
+    split_ifs at hq_dvd with h_B
+    · -- B < q.
+      have : p = q := by
+        have h_dvd_q : p ∣ q := hp.dvd_of_dvd_pow hq_dvd
+        have h_q_prime : q.Prime := Nat.prime_of_mem_primeFactors (by rw [Nat.support_factorization] at hq; exact hq)
+        exact (Nat.prime_dvd_prime_iff_eq hp h_q_prime).mp h_dvd_q
+      rw [this]
+      exact h_B
+    · -- B >= q. Term is 1.
+      exfalso
+      exact Nat.Prime.not_dvd_one hp hq_dvd
   exact lt_of_lt_of_le p_gt_B (le_of_dvd (by linarith) hp_dvd)
 
 lemma smoothPart_pos (n B : ℕ) (hn : n ≠ 0) : smoothPart n B > 0 := by
+  rw [smoothPart, Finsupp.prod]
+  apply Finset.prod_pos
+  intro p hp
+  split_ifs
+  · apply pow_pos
+    exact Nat.Prime.pos (Nat.prime_of_mem_primeFactors (by rw [Nat.support_factorization] at hp; exact hp))
+  · exact one_pos
+
+lemma smoothPart_mul (a b B : ℕ) (ha : a ≠ 0) (hb : b ≠ 0) : 
+    smoothPart (a * b) B = smoothPart a B * smoothPart b B := by
   sorry
 
-lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_g : (n.choose k).minFac > n / k) :
-    ((List.range k).map (fun i => smoothPart (n - i) (n / k))).prod = k.factorial := by
+lemma smoothPart_eq_self_of_le (n B : ℕ) (hn : n ≠ 0) (h : ∀ p, p.Prime → p ∣ n → p ≤ B) : smoothPart n B = n := by
   sorry
+
+lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * k) (h_g : (n.choose k).minFac > n / k) :
+    ((List.range k).map (fun i => smoothPart (n - i) (n / k))).prod = k.factorial := by
+  cases k with
+  | zero => simp
+  | succ k' =>
+    let k := k' + 1
+    have h_k_pos : k > 0 := Nat.succ_pos k'
+    
+    let P_list := (List.range k).map (fun i => n - i)
+    let P := P_list.prod
+    
+    have h_P_list_ne_zero : ∀ x, x ∈ P_list → x ≠ 0 := by
+      intro x hx
+      rw [List.mem_map] at hx
+      rcases hx with ⟨i, hi, rfl⟩
+      rw [List.mem_range] at hi
+      apply Nat.sub_ne_zero_of_lt
+      exact lt_of_lt_of_le hi h_nk
+
+    have smoothPart_list_prod (L : List ℕ) (hL : ∀ x, x ∈ L → x ≠ 0) : 
+        (L.map (fun x => smoothPart x (n / k))).prod = smoothPart L.prod (n / k) := by
+      induction L with
+      | nil => 
+        simp only [List.map_nil, List.prod_nil]
+        rw [smoothPart, Nat.factorization_one, Finsupp.prod_zero_index]
+      | cons head tail ih =>
+        simp only [List.map_cons, List.prod_cons]
+        have h_head : head ≠ 0 := sorry
+        have h_tail : ∀ x, x ∈ tail → x ≠ 0 := sorry
+        rw [ih h_tail]
+        rw [smoothPart_mul _ _ _ h_head (List.prod_ne_zero (fun h => h_tail 0 h rfl))]
+
+    have h_map_eq : (P_list.map (fun x => smoothPart x (n / k))).prod = (List.map (fun i => smoothPart (n - i) (n / k)) (List.range k)).prod := by
+      rw [List.map_map]
+      rfl
+      
+    rw [← h_map_eq]
+    rw [smoothPart_list_prod P_list h_P_list_ne_zero]
+    
+    have h_P_eq : P = k.factorial * n.choose k := by
+      sorry
+    
+    rw [h_P_eq]
+    rw [smoothPart_mul _ _ _ (Nat.factorial_ne_zero k) (Nat.choose_pos h_nk).ne.symm]
+    
+    have h_fact_smooth : smoothPart k.factorial (n / k) = k.factorial := by
+      apply smoothPart_eq_self_of_le _ _ (Nat.factorial_ne_zero k)
+      intro p hp h_dvd
+      have h_p_le_k : p ≤ k := Nat.le_of_dvd (Nat.factorial_pos k) h_dvd |> Nat.prime_le_of_dvd_factorial hp
+      apply le_trans h_p_le_k
+      apply (Nat.le_div_iff_mul_le h_k_pos).mpr
+      rw [mul_comm]
+      exact h_n_sq
+
+    have h_choose_smooth : smoothPart (n.choose k) (n / k) = 1 := by
+      rw [smoothPart, Finsupp.prod]
+      apply Finset.prod_eq_one
+      intro p hp
+      split_ifs with h_le
+      · exfalso
+        have h_dvd : p ∣ n.choose k := by
+          rw [Nat.support_factorization] at hp
+          rcases Nat.mem_primeFactors.mp hp with ⟨_, h_dvd⟩
+          exact h_dvd
+        have h_ge : p ≥ (n.choose k).minFac := Nat.minFac_le_of_dvd (Nat.prime_of_mem_primeFactors (by rw [Nat.support_factorization] at hp; exact hp)) h_dvd
+        linarith
+      · rfl
+
+    rw [h_fact_smooth, h_choose_smooth, mul_one]
 
 lemma range_contains_multiple_of_k (n k : ℕ) (hk : k > 0) : 
     ∃ i ∈ List.range k, k ∣ (n - i) := by
-  sorry
+  use n % k
+  constructor
+  · apply List.mem_range.mpr
+    exact Nat.mod_lt n hk
+  · apply Nat.dvd_sub_mod
 
 lemma smoothPart_ge_k (n B k : ℕ) (h_dvd : k ∣ n) (h_kB : k ≤ B) (hn : n ≠ 0) :
     smoothPart n B ≥ k := by
-  sorry
+  rcases h_dvd with ⟨q, rfl⟩
+  have h_k_ne_0 : k ≠ 0 := left_ne_zero_of_mul hn
+  have h_q_ne_0 : q ≠ 0 := right_ne_zero_of_mul hn
+  rw [smoothPart_mul k q B h_k_ne_0 h_q_ne_0]
+  have h_smooth_k : smoothPart k B = k := by
+    apply smoothPart_eq_self_of_le _ _ h_k_ne_0
+    intro p hp hpk
+    exact le_trans (Nat.le_of_dvd (Nat.pos_of_ne_zero h_k_ne_0) hpk) h_kB
+  rw [h_smooth_k]
+  have h_smooth_q_pos : smoothPart q B ≥ 1 := smoothPart_pos q B h_q_ne_0
+  exact Nat.le_mul_of_pos_right k h_smooth_q_pos
 
 lemma smoothPart_lt_k (n k i : ℕ) (h_nk : n ≥ k * k) (h_k : k > 0) 
     (h_i : i < k) (h_rough : roughPart (n - i) (n / k) > 1) :

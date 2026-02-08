@@ -67,7 +67,7 @@ theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_
 
   have h_n_ge_k : n ≥ k := le_trans (@Nat.le_self_pow k (_root_.ne_of_gt h_k) 2) h_n_k2
 
-  have h_prod := prod_smooth_eq_factorial n k h_n_ge_k h_contra
+  have h_prod := prod_smooth_eq_factorial n k h_n_ge_k h_n_k2 h_contra
   rcases range_contains_multiple_of_k n k h_k with ⟨x, hx_range, hx_dvd⟩
 
   let q := n / k
