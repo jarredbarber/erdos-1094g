@@ -46,3 +46,26 @@
 **Watch next**:
 - Ensure `erdos1094g-wyg` doesn't produce a skeleton based on the outdated proof.
 - Completion of the 1974 correction task.
+
+## Heartbeat — 2026-02-08 15:35 UTC
+
+**Metrics**:
+- Sorry count: 3
+- Verified proofs: 1 (`proofs/exploration.md`)
+- Task count: 10 (3 open, 7 closed)
+
+**Status**: Correcting role violations and out-of-order execution.
+
+**Observations**:
+- Explorer `erdos1094g-2l9` failed to update `proofs/erdos1094.md` despite claiming success.
+- Formalizer `erdos1094g-wyg` executed out of order, creating a skeleton in `Erdos/Basic.lean` based on the incorrect 1969 paper (7 exceptions instead of 12).
+- Verify agent `erdos1094g-znx` verified `proofs/exploration.md` (correct for $n \le 50$, but not the global proof).
+
+**Actions**:
+- Reopened explore task `erdos1094g-2l9` with stern instructions to use `write` tool and include all 12 exceptions.
+- Reopened formalize task `erdos1094g-wyg` to fix the skeleton once the proof is verified.
+- Fixed dependency: `erdos1094g-wyg` now correctly depends on `erdos1094g-9of` (verify updated proof).
+
+**Watch next**:
+- Verify `erdos1094g-2l9` actually writes the file this time.
+- Verify `erdos1094g-wyg` updates the `Exceptions` set and proof structure in Lean.
