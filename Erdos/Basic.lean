@@ -1,5 +1,6 @@
 import Mathlib
 import Erdos.Sylvester
+import Erdos.Ecklund
 
 open Nat
 
@@ -40,8 +41,9 @@ This theorem is now proved in `Erdos.Sylvester`. -/
 is at most `n / k`, except for the specified exceptions.
 Note: Ecklund (1969) originally stated `g(n, k) ≤ n/k` for `n ≥ k^2` with no exceptions in this range,
 but `(62, 6)` is a known counterexample (where `g = 19 > 62/6`). -/
-axiom ecklund_1969_case1_bound (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
-    (h_not_exc : (n, k) ≠ (62, 6)) : g n k ≤ n / k
+theorem ecklund_1969_case1_bound (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
+    (h_not_exc : (n, k) ≠ (62, 6)) : g n k ≤ n / k := by
+  apply Erdos1094.ecklund_case1_proof n k h_k h_nk h_n_k2 h_not_exc
 
 /-- Ecklund's Theorem, Case 1: For `n ≥ k^2`, the least prime factor of `n.choose k`
 is at most `n / k`, except for the specified exceptions. -/
