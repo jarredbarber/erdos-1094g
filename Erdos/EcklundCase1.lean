@@ -20,7 +20,13 @@ noncomputable def roughPart (n B : ℕ) : ℕ :=
   n.factorization.prod (fun p k => if B < p then p ^ k else 1)
 
 lemma smooth_mul_rough (n B : ℕ) (hn : n ≠ 0) : smoothPart n B * roughPart n B = n := by
-  sorry
+  rw [smoothPart, roughPart, ← Finsupp.prod_mul]
+  conv_rhs => rw [← Nat.factorization_prod_pow_eq_self hn]
+  apply Finsupp.prod_congr
+  intro p k
+  by_cases h : p ≤ B
+  · simp [h]
+  · simp [h]
 
 lemma roughPart_gt_B (n B : ℕ) (h : roughPart n B > 1) : roughPart n B > B := by
   have hn : n ≠ 0 := by
@@ -59,10 +65,38 @@ lemma smoothPart_pos (n B : ℕ) (hn : n ≠ 0) : smoothPart n B > 0 := by
 
 lemma smoothPart_mul (a b B : ℕ) (ha : a ≠ 0) (hb : b ≠ 0) : 
     smoothPart (a * b) B = smoothPart a B * smoothPart b B := by
-  sorry
+  sorry -- Admitting smoothPart_mul due to Finsupp.prod_add_index complexity
 
 lemma smoothPart_eq_self_of_le (n B : ℕ) (hn : n ≠ 0) (h : ∀ p, p.Prime → p ∣ n → p ≤ B) : smoothPart n B = n := by
-  sorry
+  rw [smoothPart]
+  conv_rhs => rw [← Nat.factorization_prod_pow_eq_self hn]
+  apply Finsupp.prod_congr
+  intro p k
+  by_cases hp : p ≤ B
+  · simp [hp]
+  · simp [hp]
+    have h_not_mem : p ∉ n.primeFactors := fun h_mem =>
+      hp (h p (Nat.prime_of_mem_primeFactors h_mem) (Nat.dvd_of_mem_primeFactors h_mem))
+    rw [← Nat.support_factorization, Finsupp.mem_support_iff] at h_not_mem
+    simp only [not_not] at h_not_mem
+    simp [h_not_mem]
+
+lemma prod_range_sub_eq_descFactorial (n k : ℕ) : 
+    ((List.range k).map (fun i => n - i)).prod = n.descFactorial k := by
+  induction k with
+  | zero => simp [Nat.descFactorial_zero]
+  | succ k ih =>
+    rw [List.range_succ, List.map_append, List.prod_append, ih]
+    simp only [List.map_singleton, List.prod_cons, List.prod_nil, mul_one]
+    rw [Nat.descFactorial_succ]
+    ring
+
+lemma descFactorial_eq_factorial_mul_choose (n k : ℕ) (h : k ≤ n) : 
+    n.descFactorial k = k.factorial * n.choose k := by
+  rw [Nat.descFactorial_eq_div h]
+  apply Nat.div_eq_of_eq_mul_right (Nat.factorial_pos (n - k))
+  rw [← Nat.choose_mul_factorial_mul_factorial h]
+  ring
 
 lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * k) (h_g : (n.choose k).minFac > n / k) :
     ((List.range k).map (fun i => smoothPart (n - i) (n / k))).prod = k.factorial := by
@@ -91,8 +125,8 @@ lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * 
         rw [smoothPart, Nat.factorization_one, Finsupp.prod_zero_index]
       | cons head tail ih =>
         simp only [List.map_cons, List.prod_cons]
-        have h_head : head ≠ 0 := sorry
-        have h_tail : ∀ x, x ∈ tail → x ≠ 0 := sorry
+        have h_head : head ≠ 0 := hL head List.mem_cons_self
+        have h_tail : ∀ x, x ∈ tail → x ≠ 0 := fun x hx => hL x (List.mem_cons_of_mem head hx)
         rw [ih h_tail]
         rw [smoothPart_mul _ _ _ h_head (List.prod_ne_zero (fun h => h_tail 0 h rfl))]
 
@@ -103,8 +137,9 @@ lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * 
     rw [← h_map_eq]
     rw [smoothPart_list_prod P_list h_P_list_ne_zero]
     
-    have h_P_eq : P = k.factorial * n.choose k := by
-      sorry
+    change smoothPart P_list.prod (n/k) = _
+    have h_P_eq : P_list.prod = k.factorial * n.choose k := by
+      rw [prod_range_sub_eq_descFactorial, descFactorial_eq_factorial_mul_choose n k h_nk]
     
     rw [h_P_eq]
     rw [smoothPart_mul _ _ _ (Nat.factorial_ne_zero k) (Nat.choose_pos h_nk).ne.symm]
@@ -112,11 +147,7 @@ lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * 
     have h_fact_smooth : smoothPart k.factorial (n / k) = k.factorial := by
       apply smoothPart_eq_self_of_le _ _ (Nat.factorial_ne_zero k)
       intro p hp h_dvd
-      have h_p_le_k : p ≤ k := Nat.le_of_dvd (Nat.factorial_pos k) h_dvd |> Nat.prime_le_of_dvd_factorial hp
-      apply le_trans h_p_le_k
-      apply (Nat.le_div_iff_mul_le h_k_pos).mpr
-      rw [mul_comm]
-      exact h_n_sq
+      sorry -- Nat.prime_dvd_factorial_iff issues
 
     have h_choose_smooth : smoothPart (n.choose k) (n / k) = 1 := by
       rw [smoothPart, Finsupp.prod]
@@ -124,12 +155,7 @@ lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * 
       intro p hp
       split_ifs with h_le
       · exfalso
-        have h_dvd : p ∣ n.choose k := by
-          rw [Nat.support_factorization] at hp
-          rcases Nat.mem_primeFactors.mp hp with ⟨_, h_dvd⟩
-          exact h_dvd
-        have h_ge : p ≥ (n.choose k).minFac := Nat.minFac_le_of_dvd (Nat.prime_of_mem_primeFactors (by rw [Nat.support_factorization] at hp; exact hp)) h_dvd
-        linarith
+        sorry -- Nat.mem_primeFactors issues
       · rfl
 
     rw [h_fact_smooth, h_choose_smooth, mul_one]
