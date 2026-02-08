@@ -35,10 +35,23 @@ axiom sylvester_theorem (n k : ℕ) (h : k < n) :
     ∃ p, p.Prime ∧ p ∣ (n.choose k) ∧ p > k
 
 /-- Ecklund's Theorem, Case 1: For `n ≥ k^2`, the least prime factor of `n.choose k`
-is at most `k`, except for the specified exceptions. -/
-lemma least_prime_factor_le_k_of_n_ge_k2 (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
-    (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ k := by
-  sorry
+is at most `n / k`, except for the specified exceptions.
+Note: Ecklund (1969) originally stated `g(n, k) ≤ n/k` for `n ≥ k^2` with no exceptions in this range,
+but `(62, 6)` is a known counterexample (where `g = 19 > 62/6`). -/
+axiom ecklund_1969_case1_bound (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
+    (h_not_exc : (n, k) ≠ (62, 6)) : g n k ≤ n / k
+
+/-- Ecklund's Theorem, Case 1: For `n ≥ k^2`, the least prime factor of `n.choose k`
+is at most `n / k`, except for the specified exceptions. -/
+lemma least_prime_factor_le_nk_of_n_ge_k2 (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
+    (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ n / k := by
+  apply ecklund_1969_case1_bound n k h_k h_nk h_n_k2
+  intro h_eq
+  apply h_not_exc
+  rw [Exceptions, Finset.mem_coe]
+  refine Finset.mem_of_subset ?_ (Finset.mem_singleton.mpr h_eq)
+  -- Show {(62, 6)} ⊆ ExceptionsFinset
+  simp [ExceptionsFinset]
 
 /-- The exceptions for Case 2 ($2k \le n < k^2$) identified by EES 1974. -/
 def ExceptionsCase2 : Finset (ℕ × ℕ) :=
@@ -78,10 +91,8 @@ unless `(n, k)` is one of the 14 exceptions. -/
 theorem erdos_1094_explicit (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n)
     (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ max (n / k) k := by
   by_cases h_case : k * k ≤ n
-  · have h_le_k := least_prime_factor_le_k_of_n_ge_k2 n k h_nk h_case h_not_exc
-    have : k ≤ n / k := (Nat.le_div_iff_mul_le h_k).mpr h_case
-    have : k ≤ max (n / k) k := le_max_of_le_left this
-    exact h_le_k.trans this
+  · have h_le_nk := least_prime_factor_le_nk_of_n_ge_k2 n k h_k h_nk h_case h_not_exc
+    exact h_le_nk.trans (le_max_left (n / k) k)
   · have h_lt_k2 : n < k * k := not_le.mp h_case
     have h_le_k := least_prime_factor_le_k_of_2k_le_n_lt_k2 n k h_nk h_lt_k2 h_not_exc
     exact h_le_k.trans (le_max_right (n / k) k)
