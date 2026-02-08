@@ -1,9 +1,10 @@
 # Case 2 of Ecklund's Theorem: $2k \le n < k^2$
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
 **Statement:** For integers $n, k$ such that $2k \le n < k^2$, the least prime factor $g(n, k)$ of the binomial coefficient $\binom{n}{k}$ satisfies $g(n, k) \le k$, with exactly 13 exceptions.
 **Dependencies:** proofs/erdos1094.md
 **Confidence:** Certain
+**Reviewed by:** erdos1094g-41u
 
 ## Introduction
 
