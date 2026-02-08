@@ -625,3 +625,67 @@ $ tm update erdos1094g-8ot --status "Updating proofs/erdos1094.md with 14 except
 📊 Task erdos1094g-8ot completed:
 [2026-02-08T15:49:15.179Z]    Summary: Updated proofs/erdos1094.md with 14 exceptions and corrected binomial values.
 [2026-02-08T15:49:15.179Z]    Details: Expanded the list of exceptions from 12 to 14 by adding (241, 16) and (284, 28). Corrected the values of binomial coefficients for (44, 8), (74, 10), (94, 10), and (95, 10). Updated the text in Case 2 and the 'List of Exceptions' section to reflect these changes and acknowledge the omission of two cases in the original 1974 paper by Ecklund, Erdős, and Selfridge. Verified the least prime factors for the new cases using Kummer's Theorem.
+[2026-02-08T15:49:15.303Z] ✅ Successfully merged task/erdos1094g-8ot into main
+[2026-02-08T15:49:15.304Z] 🗑️  Deleting branch task/erdos1094g-8ot...
+[2026-02-08T15:49:15.309Z] ✓ Deleted local branch task/erdos1094g-8ot
+[2026-02-08T15:49:15.314Z] 🚀 Pushing main to remote...
+[2026-02-08T15:49:15.901Z] ✓ Pushed to remote
+[2026-02-08T15:49:16.904Z] ⏳ No tasks available. Waiting for new tasks (polling every 5 seconds)...
+[2026-02-08T15:53:47.314Z] [overseer] No active work. Running one idle heartbeat...
+[2026-02-08T15:53:47.314Z] [overseer] 💓 Heartbeat starting...
+[2026-02-08T15:53:47.317Z] [overseer] Running with model: google-antigravity/gemini-3-pro:high
+[2026-02-08T15:54:22.225Z] 
+================================================================================
+[2026-02-08T15:54:22.225Z] 📌 Processing task: erdos1094g-80i - Verify proofs/erdos1094.md (14 exceptions)
+[2026-02-08T15:54:22.225Z]    Role: verify | Priority: 0 | Size: medium
+[2026-02-08T15:54:22.225Z] ================================================================================
+
+[2026-02-08T15:54:22.229Z] ✓ Claimed task erdos1094g-80i
+
+[2026-02-08T15:54:22.229Z] 🤖 Using agent: verify with models: google-antigravity/gemini-3-pro:high
+
+[2026-02-08T15:54:22.229Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro:high...
+[2026-02-08T15:54:22.242Z] 📸 Capturing file state before agent execution...
+[2026-02-08T15:54:22.253Z] ✓ Captured state: 31 tracked, 3 untracked files
+
+[2026-02-08T15:54:22.253Z] 🌿 Creating branch: task/erdos1094g-80i
+[2026-02-08T15:54:22.258Z] ✓ Working on branch task/erdos1094g-80i
+
+[2026-02-08T15:54:26.397Z] 
+$ ls proofs/erdos1094.md
+[2026-02-08T15:54:27.868Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:54:34.912Z] 
+🛠️  Executing tool: write...
+[2026-02-08T15:54:36.595Z] 
+$ python3 verify_exceptions.py
+[2026-02-08T15:54:40.882Z] [overseer] 💓 Heartbeat complete: Created verify task for 14 exceptions and advisor task for planning formalization.
+[2026-02-08T15:55:16.152Z] 
+🛠️  Executing tool: write...
+[2026-02-08T15:55:20.735Z] 
+🛠️  Executing tool: write...
+[2026-02-08T15:55:22.407Z] 
+$ python3 search_exceptions.py
+[2026-02-08T15:55:35.190Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:55:42.251Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:55:48.923Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:55:51.308Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:55:52.991Z] 
+$ rm verify_exceptions.py search_exceptions.py
+[2026-02-08T15:55:56.676Z] 
+
+📝 Agent response complete.
+
+[2026-02-08T15:55:56.677Z] 📄 Log saved to .tm/logs/worker-erdos1094g-80i.md
+[2026-02-08T15:55:56.677Z] 
+📊 Task erdos1094g-80i completed:
+[2026-02-08T15:55:56.677Z]    Summary: Approved — proofs/erdos1094.md
+[2026-02-08T15:55:56.677Z]    Details: The 14 exceptions listed in proofs/erdos1094.md have been verified using Kummer's theorem (carry-based verification). For each pair (n, k), the least prime factor g(n, k) was confirmed to exceed max(n/k, k). Specifically:
+- (62, 6): g(62, 6) = 19 > 10.33
+- (241, 16): g(241, 16) = 17 > 16
+- (284, 28): g(284, 28) = 29 > 28
+A computational search for k < 40 confirmed that no other exceptions exist in that range. The proof file has been updated to 'Verified ✅' status and includes a Reviewer's Verification section summarizing these findings.
