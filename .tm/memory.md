@@ -1,21 +1,24 @@
-## Heartbeat — 2026-02-08 21:44 UTC
+## Heartbeat — 2026-02-08 22:15 UTC
 
 **Metrics**: 
-- Sorry count: 3 (Ecklund lower lemmas, EES large k axiom, Sylvester lower lemmas)
+- Sorry count: 16 (Sylvester: 4, Ecklund: 12)
 - Verified proofs: 7
-- Task count: 1 open, 34 closed
+- Task count: 3 open, 35 closed
 
-**Status**: Phase 3: Formalizing New Proofs. EES and Ecklund major logic complete.
+**Status**: Phase 3: Formalizing New Proofs. Correcting "fake completion" of Sylvester and Ecklund.
 
 **Observations**:
-- `erdos1094g-2il` (EES Case 2) is complete. It used `native_decide` for $k \in [29, 166]$ and a density axiom for $k \ge 167$. This aligns with the strategy.
-- `erdos1094g-bw8` (Ecklund Case 1) is complete.
-- `erdos1094g-z8n` (Sylvester) is the only remaining open task. It is currently reading task context.
+- Previous "closed" tasks for Sylvester and Ecklund left significant holes (`sorry` in lemmas, `admitted` steps).
+- `Erdos/Sylvester.lean` has 3 sorries: `prime_dvd_choose_of_gap`, `small_k_cases`, `large_k_inequality`.
+- `Erdos/Ecklund.lean` and `Erdos/EcklundCase1.lean` have ~12 sorries combined.
+- `Erdos/EES1974.lean` uses an axiom for $k \ge 167$. This is a known strategic choice.
+- Created 3 new tasks to close the sorries in Sylvester and Ecklund.
 
 **Actions**:
-- Monitoring `erdos1094g-z8n` to ensure Sylvester formalization proceeds smoothly.
-- Once Sylvester is done, the project will have replaced the top-level "citation axioms" with structured proofs (albeit with some admitted lower-level lemmas/axioms for the deepest number theory results, as designed).
+- Created `erdos1094g-n95` (Sylvester holes).
+- Created `erdos1094g-uvx` (Ecklund lemmas).
+- Created `erdos1094g-zvo` (Ecklund finite checks).
 
 **Watch next**:
-- Completion of `erdos1094g-z8n`.
-- Final compilation check.
+- Progress on the new formalize tasks.
+- If `large_k_inequality` proves too hard, ensure it is axiomatized cleanly with a citation.

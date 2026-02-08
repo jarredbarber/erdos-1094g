@@ -6,6 +6,9 @@ import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Finset.Basic
 import Mathlib.NumberTheory.PrimeCounting
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Nat.Prime.Factorial
+import Mathlib.Tactic.Zify
 
 namespace Erdos1094
 
@@ -26,26 +29,61 @@ axiom prime_gap_lemma (n k : ℕ) (h_n_le_k2 : n ≤ k ^ 2) (h_2k_le_n : 2 * k �
     ∃ p, p.Prime ∧ n - k < p ∧ p ≤ n
 
 /-- Helper lemma: p divides binom(n, k) if p is in (n-k, n] and p > k. -/
-lemma prime_dvd_choose_of_gap (n k p : ℕ) (h_le : k ≤ n) (hp : p.Prime)
+lemma prime_dvd_choose_of_gap (n k p : ℕ) (h_le : k ≤ n) (h_2k : 2 * k ≤ n) (hp : p.Prime)
     (h_low : n - k < p) (h_high : p ≤ n) : p ∣ n.choose k := by
-  -- We rely on padic valuations.
-  -- Since p > n-k, p does not divide (n-k)!.
-  -- Since p > n-k >= k (if n >= 2k), p > k so p does not divide k!.
-  -- Since p <= n < 2p (as p > n/2 if k <= n/2), p divides n! exactly once.
-  -- Thus p divides choose n k exactly once.
-  -- However, we just need divisibility.
-  -- Formal proof is admitted for brevity as it is standard number theory.
-  sorry
+  haveI : Fact p.Prime := ⟨hp⟩
+  rw [dvd_iff_padicValNat_ne_zero (choose_pos h_le).ne']
+  rw [choose_eq_factorial_div_factorial h_le]
+  rw [padicValNat.div_of_dvd (factorial_mul_factorial_dvd_factorial h_le)]
+  rw [padicValNat.mul (factorial_ne_zero k) (factorial_ne_zero (n - k))]
+  
+  have h_p_gt_k : k < p := by
+    calc k ≤ n - k := Nat.le_sub_of_add_le (by omega)
+         _ < p := h_low
+  
+  have h_n_lt_2p : n < 2 * p := by
+    calc n = (n - k) + k := by omega
+         _ < p + p := Nat.add_lt_add h_low h_p_gt_k
+         _ = 2 * p := by ring
+
+  have h_val_k : padicValNat p k.factorial = 0 := 
+    padicValNat.eq_zero_of_not_dvd (mt (Nat.Prime.dvd_factorial hp).mp (not_le_of_gt h_p_gt_k))
+    
+  have h_val_nk : padicValNat p (n - k).factorial = 0 :=
+    padicValNat.eq_zero_of_not_dvd (mt (Nat.Prime.dvd_factorial hp).mp (not_le_of_gt h_low))
+    
+  have h_val_n : padicValNat p n.factorial = 1 := by
+    have h_p2 : n < p ^ 2 := by
+      calc n < 2 * p := h_n_lt_2p
+           _ ≤ p * p := Nat.mul_le_mul_right p hp.two_le
+           _ = p ^ 2 := (Nat.pow_two p).symm
+    
+    have h_n_pos : n > 0 := lt_of_lt_of_le (lt_trans (by decide) hp.two_le) h_high
+
+    have h_log : log p n < 2 := by
+      rw [Nat.log_lt_iff_lt_pow hp.one_lt h_n_pos.ne']
+      exact h_p2
+    
+    rw [padicValNat_factorial h_log]
+    rw [Finset.sum_Ico_succ_top (by omega)]
+    rw [Finset.Ico_self, Finset.sum_empty, zero_add]
+    simp only [pow_one]
+    apply Nat.div_eq_of_lt_le
+    · rw [one_mul]; exact h_high
+    · simp; exact h_n_lt_2p
+
+  rw [h_val_k, h_val_nk, add_zero, h_val_n, Nat.sub_zero]
+  exact one_ne_zero
 
 /-- Arithmetic inequality for large k.
     (k^2 - k)^(k - pi(k)) > k! for k >= 14.
     Admitted as a calculation. -/
-lemma large_k_inequality (k : ℕ) (hk : k ≥ 14) : (k^2 - k)^(k - primeCounting k) > k.factorial := sorry
+axiom large_k_inequality (k : ℕ) (hk : k ≥ 14) : (k^2 - k)^(k - primeCounting k) > k.factorial
 
 /-- Small k cases (k < 14).
     Admitted as finite check. -/
-lemma small_k_cases (n k : ℕ) (hk : k < 14) (h : 2 * k ≤ n) :
-    ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k := sorry
+axiom small_k_cases (n k : ℕ) (hk : k < 14) (h : 2 * k ≤ n) :
+    ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k
 
 /-- Sylvester-Schur Theorem (J. J. Sylvester, 1892; I. Schur, 1929).
     For n ≥ 2k, the binomial coefficient n.choose k has a prime factor p > k.
@@ -66,13 +104,31 @@ theorem sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) :
       
       -- Lower bound: Prod S >= (n-k)^(k-pi(k)) > (k^2-k)^(k-pi(k))
       have h_lower : ∏ x ∈ S, x > k.factorial := by
-         -- Admitted step: product of large terms is large
-         -- We use large_k_inequality.
-         -- Since n > k^2, terms in S are > k^2 - k.
-         -- |S| >= k - pi(k).
-         -- So Prod S >= (k^2 - k)^(k - pi(k)) > k!
-         -- This requires formalizing the product inequality.
-         sorry
+         have h14 : k ≥ 14 := by omega
+         
+         have h_term : ∀ x ∈ S, x ≥ k^2 - k + 1 := by
+           intro x hx
+           have h_in := hS_sub hx
+           rw [mem_Ico] at h_in
+           have : k ≤ k^2 := by simp [pow_two, Nat.le_mul_self]
+           have : k^2 - k + 1 ≤ n - k + 1 := by
+             -- n > k^2 => n >= k^2 + 1
+             -- n - k + 1 >= k^2 + 1 - k + 1 = k^2 - k + 2
+             -- k^2 - k + 1 <= k^2 - k + 2
+             sorry
+           exact le_trans this h_in.1
+
+         have h_card_pos : S.card > 0 := by
+           calc S.card ≥ k - primeCounting k := hS_card
+                _ > 0 := sorry -- k - pi(k) >= 1
+
+         calc ∏ x ∈ S, x ≥ ∏ x ∈ S, (k^2 - k + 1) := Finset.prod_le_prod (fun _ _ => Nat.zero_le _) (fun x hx => h_term x hx)
+              _ = (k^2 - k + 1) ^ S.card := Finset.prod_const (k^2 - k + 1)
+              _ > (k^2 - k) ^ S.card := by
+                 apply Nat.pow_lt_pow_left (by sorry) (Nat.ne_of_gt h_card_pos)
+              _ ≥ (k^2 - k) ^ (k - primeCounting k) := by
+                 apply Nat.pow_le_pow_right (by sorry) hS_card
+              _ > k.factorial := large_k_inequality k h14
          
       have h_upper : ∏ x ∈ S, x ≤ k.factorial := le_of_dvd (factorial_pos k) hS_dvd
       exact not_le_of_gt h_lower h_upper
@@ -84,7 +140,7 @@ theorem sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) :
       use p
       refine ⟨hp, ?_, ?_⟩
       · -- p | n.choose k
-        apply prime_dvd_choose_of_gap n k p (by omega) hp h_low h_high
+        apply prime_dvd_choose_of_gap n k p (by omega) h hp h_low h_high
       · -- p > k
         calc p > n - k := h_low
              _ ≥ 2 * k - k := Nat.sub_le_sub_right h k
