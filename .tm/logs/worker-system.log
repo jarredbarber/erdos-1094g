@@ -559,3 +559,69 @@ $ tm update erdos1094g-wyg --status "Completed skeleton in Erdos/Basic.lean"
     *   `erdos_1094`: The set-based statement that the set of violators is finite.
 
 The file compiles successfully with `lake build`, with the expected `sorry` warnings for the intermediate lemmas.
+[2026-02-08T15:47:32.015Z] ✅ Successfully merged task/erdos1094g-wyg into main
+[2026-02-08T15:47:32.015Z] 🗑️  Deleting branch task/erdos1094g-wyg...
+[2026-02-08T15:47:32.020Z] ✓ Deleted local branch task/erdos1094g-wyg
+[2026-02-08T15:47:32.025Z] 🚀 Pushing main to remote...
+[2026-02-08T15:47:32.841Z] ✓ Pushed to remote
+[2026-02-08T15:47:33.844Z] 
+================================================================================
+[2026-02-08T15:47:33.844Z] 📌 Processing task: erdos1094g-8ot - Update erdos1094.md with 14 exceptions and corrected values
+[2026-02-08T15:47:33.844Z]    Role: explore | Priority: 1 | Size: medium
+[2026-02-08T15:47:33.844Z] ================================================================================
+
+[2026-02-08T15:47:33.846Z] ✓ Claimed task erdos1094g-8ot
+
+[2026-02-08T15:47:33.846Z] 🤖 Using agent: explore with models: google-antigravity/gemini-3-pro:high
+
+[2026-02-08T15:47:33.846Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro:high...
+[2026-02-08T15:47:33.862Z] 📸 Capturing file state before agent execution...
+[2026-02-08T15:47:33.871Z] ✓ Captured state: 30 tracked, 1 untracked files
+
+[2026-02-08T15:47:33.871Z] 🌿 Creating branch: task/erdos1094g-8ot
+[2026-02-08T15:47:33.878Z] ✓ Working on branch task/erdos1094g-8ot
+
+[2026-02-08T15:47:36.106Z] 
+$ ls proofs/erdos1094.md
+[2026-02-08T15:47:37.708Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:47:47.820Z] 
+$ echo "define ncr(n,r) {
+  val = 1
+  for (i = 1; i <= r; i++) {
+    val = val * (n - i + 1) / i
+  }
+  return val
+}
+ncr(44, 8)
+ncr(74, 10)
+ncr(94, 10)
+ncr(95, 10)
+ncr(47, 10)
+ncr(46, 10)
+ncr(47, 11)
+ncr(241, 16)
+ncr(284, 28)" | bc -l
+[2026-02-08T15:48:13.207Z] 
+$ tm update erdos1094g-8ot --status "Updating proofs/erdos1094.md with 14 exceptions and corrected values"
+[2026-02-08T15:48:17.761Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:48:21.636Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:48:41.150Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:48:52.981Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:49:01.822Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:49:12.890Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:49:15.178Z] 
+
+📝 Agent response complete.
+
+[2026-02-08T15:49:15.179Z] 📄 Log saved to .tm/logs/worker-erdos1094g-8ot.md
+[2026-02-08T15:49:15.179Z] 
+📊 Task erdos1094g-8ot completed:
+[2026-02-08T15:49:15.179Z]    Summary: Updated proofs/erdos1094.md with 14 exceptions and corrected binomial values.
+[2026-02-08T15:49:15.179Z]    Details: Expanded the list of exceptions from 12 to 14 by adding (241, 16) and (284, 28). Corrected the values of binomial coefficients for (44, 8), (74, 10), (94, 10), and (95, 10). Updated the text in Case 2 and the 'List of Exceptions' section to reflect these changes and acknowledge the omission of two cases in the original 1974 paper by Ecklund, Erdős, and Selfridge. Verified the least prime factors for the new cases using Kummer's Theorem.
