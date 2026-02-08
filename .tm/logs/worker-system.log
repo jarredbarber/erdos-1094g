@@ -479,3 +479,83 @@ $ tm create -t "Update erdos1094.md with 14 exceptions and corrected values" -r 
 2. **Incorrect Values:** Several binomial coefficient values in the table were found to be incorrect (specifically for $n=44, 74, 94, 95$). For example, $\binom{44}{8}$ was listed as $17,610,393$ but is actually $177,232,627$.
 3. **Status Updated:** The file status has been changed to **Under review 🔍** and a `## Review Notes` section has been added with specific feedback.
 4. **Follow-up Task:** An `explore` task (`erdos1094g-8ot`) has been created to incorporate the missing exceptions and correct the table values.
+[2026-02-08T15:44:50.247Z] ✅ Successfully merged task/erdos1094g-9of into main
+[2026-02-08T15:44:50.247Z] 🗑️  Deleting branch task/erdos1094g-9of...
+[2026-02-08T15:44:50.252Z] ✓ Deleted local branch task/erdos1094g-9of
+[2026-02-08T15:44:50.257Z] 🚀 Pushing main to remote...
+[2026-02-08T15:44:50.848Z] ✓ Pushed to remote
+[2026-02-08T15:44:51.851Z] 
+================================================================================
+[2026-02-08T15:44:51.851Z] 📌 Processing task: erdos1094g-wyg - Formalize Erdős 1094: Create skeleton
+[2026-02-08T15:44:51.851Z]    Role: formalize | Priority: 1 | Size: medium
+[2026-02-08T15:44:51.851Z] ================================================================================
+
+[2026-02-08T15:44:51.854Z] ✓ Claimed task erdos1094g-wyg
+
+[2026-02-08T15:44:51.854Z] 🤖 Using agent: formalize with models: google-antigravity/gemini-3-pro:high
+
+[2026-02-08T15:44:51.854Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro:high...
+[2026-02-08T15:44:51.880Z] 🔄 Resuming session: 605ed409-77f3-4083-9ca2-feea7fb695b3
+[2026-02-08T15:44:51.898Z] ✓ Captured state: 30 tracked, 0 untracked files
+
+[2026-02-08T15:44:51.887Z] 📸 Capturing file state before agent execution...
+[2026-02-08T15:44:51.903Z] 🌿 Creating branch: task/erdos1094g-wyg
+[2026-02-08T15:44:51.912Z] ✓ Working on branch task/erdos1094g-wyg
+
+[2026-02-08T15:44:53.786Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:45:07.097Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:45:11.575Z] 
+$ lake build
+[2026-02-08T15:45:37.173Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:45:40.263Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:45:48.453Z] 
+🛠️  Executing tool: write...
+[2026-02-08T15:45:50.495Z] 
+$ lake build
+[2026-02-08T15:46:16.415Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:46:18.170Z] 
+$ lake build
+[2026-02-08T15:46:38.139Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:46:40.186Z] 
+$ lake build
+[2026-02-08T15:46:55.318Z] 
+$ grep -r "not_lt_of_le" .lake/packages/mathlib/Mathlib/ | head -n 5
+[2026-02-08T15:47:01.127Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:47:02.613Z] 
+$ lake build
+[2026-02-08T15:47:26.353Z] 
+$ tm update erdos1094g-wyg --status "Completed skeleton in Erdos/Basic.lean"
+[2026-02-08T15:47:31.881Z] 
+
+📝 Agent response complete.
+
+[2026-02-08T15:47:31.883Z] 📄 Log saved to .tm/logs/worker-erdos1094g-wyg.md
+[2026-02-08T15:47:31.883Z] 
+📊 Task erdos1094g-wyg completed:
+[2026-02-08T15:47:31.883Z]    Summary: Created Lean skeleton for Erdős 1094 in Erdos/Basic.lean. lake build succeeds.
+[2026-02-08T15:47:31.883Z]    Details: The Lean skeleton for Erdős Problem 1094 has been created in `Erdos/Basic.lean`. The implementation includes:
+
+1.  **Definitions**:
+    *   `g n k`: The least prime factor of $\binom{n}{k}$.
+    *   `ExceptionsFinset` and `Exceptions`: The set of 7 known pairs $(n, k)$ that violate the bound.
+
+2.  **Axioms**:
+    *   `sylvester_theorem`: Stated as an axiom with citation (J. J. Sylvester, 1892), as it is a standard result not yet fully integrated into Mathlib for this specific application.
+
+3.  **Lemmas** (broken down according to the natural language proof):
+    *   `least_prime_factor_le_k_of_n_ge_k2`: Case 1 ($n \ge k^2$), showing $g(n, k) \le k$.
+    *   `least_prime_factor_le_k_of_2k_le_n_lt_k2`: Case 2 ($2k \le n < k^2$), showing $g(n, k) \le k$ for non-exceptional cases.
+    *   `exception_violation`: A placeholder for verifying the 7 exceptions.
+
+4.  **Theorems**:
+    *   `erdos_1094_explicit`: The bound $g(n, k) \le \max(n/k, k)$ for all $(n, k) \notin \text{Exceptions}$.
+    *   `erdos_1094`: The set-based statement that the set of violators is finite.
+
+The file compiles successfully with `lake build`, with the expected `sorry` warnings for the intermediate lemmas.

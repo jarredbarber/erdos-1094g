@@ -20,8 +20,11 @@ Pacific Journal of Mathematics, 29(2), 267-270 (1969).
 def g (n k : ℕ) : ℕ := (n.choose k).minFac
 
 /-- The list of exceptions to the Erdős 1094 bound. -/
-def Exceptions : Set (ℕ × ℕ) :=
+def ExceptionsFinset : Finset (ℕ × ℕ) :=
   {(7, 3), (13, 4), (14, 4), (23, 5), (44, 8), (46, 10), (47, 11)}
+
+/-- The set of exceptions to the Erdős 1094 bound. -/
+def Exceptions : Set (ℕ × ℕ) := ↑ExceptionsFinset
 
 /-- Sylvester's Theorem (J. J. Sylvester, 1892).
 For `n > k`, the product of `k` consecutive integers `n(n-1)...(n-k+1)`
@@ -50,8 +53,8 @@ lemma exception_violation (n k : ℕ) (h : (n, k) ∈ Exceptions) :
 /-- The main result: Erdős 1094.
 For `n ≥ 2k`, the least prime factor of `n.choose k` is at most `max (n/k) k`,
 unless `(n, k)` is one of the 7 exceptions. -/
-theorem erdos_1094 (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_not_exc : (n, k) ∉ Exceptions) :
-    g n k ≤ max (n / k) k := by
+theorem erdos_1094_explicit (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n)
+    (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ max (n / k) k := by
   by_cases h_case : k * k ≤ n
   · have h_le_k := least_prime_factor_le_k_of_n_ge_k2 n k h_nk h_case
     have : k ≤ n / k := (Nat.le_div_iff_mul_le h_k).mpr h_case
@@ -60,5 +63,17 @@ theorem erdos_1094 (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_not_exc : (
   · have h_lt_k2 : n < k * k := not_le.mp h_case
     have h_le_k := least_prime_factor_le_k_of_2k_le_n_lt_k2 n k h_nk h_lt_k2 h_not_exc
     exact h_le_k.trans (le_max_right (n / k) k)
+
+/-- The set of pairs (n, k) with n ≥ 2k violating the Erdős 1094 bound is finite. -/
+theorem erdos_1094 :
+    {p : ℕ × ℕ | 0 < p.2 ∧ 2 * p.2 ≤ p.1 ∧ g p.1 p.2 > max (p.1 / p.2) p.2}.Finite := by
+  have h_sub : {p : ℕ × ℕ | 0 < p.2 ∧ 2 * p.2 ≤ p.1 ∧ g p.1 p.2 > max (p.1 / p.2) p.2} ⊆
+      Exceptions := by
+    intro p hp
+    rcases hp with ⟨h_k, h_nk, h_g⟩
+    by_contra h_not_exc
+    have h_le := erdos_1094_explicit p.1 p.2 h_k h_nk h_not_exc
+    exact (Nat.not_le.mpr h_g) h_le
+  exact ExceptionsFinset.finite_toSet.subset h_sub
 
 end Erdos1094
