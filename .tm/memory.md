@@ -1,22 +1,20 @@
-## Heartbeat — 2026-02-08 19:10 UTC
+## Heartbeat — 2026-02-08 19:24 UTC
 
 **Metrics**: 
 - Sorry count: 0 (PROJECT COMPLETE)
 - Verified proofs: 4
-- Task count: 0 open, 20 closed
+- Task count: 0 open, 21 closed
 
-**Status**: Project successfully completed.
+**Status**: Project successfully completed and documented.
 
 **Observations**:
-- The final sorry was closed by `erdos1094g-7fl`.
-- `lake build` succeeds with no errors.
-- The formalization in `Erdos/Basic.lean` correctly states the Erdős 1094 conjecture: for $n \ge 2k$, $g(n, k) \le \max(n/k, k)$ with exactly 14 exceptions.
-- The proof uses two citation axioms for the hard bounds: `ecklund_1969_case1_bound` and `ees_1974_case2_bound`. This aligns with the project strategy.
-- The 14 exceptions in Lean match the verified literature in `proofs/erdos1094.md`.
+- The project is fully complete.
+- `README.md` has been created and correctly describes the project's strategy (citation axioms) vs the alternative approach.
+- Compilation (`lake build`) succeeds with 0 errors.
+- The theorem statement in `Erdos/Basic.lean` is verified to match the literature.
 
 **Actions**:
-- Closed the stale failed task `erdos1094g-g6c`.
-- Verified compilation and correctness of the final artifact.
+- Closed the final task `erdos1094g-oma` (README creation) which had completed its work but remained open.
 
 **Watch next**:
-- None.
+- None. Project is done.
