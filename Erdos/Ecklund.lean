@@ -1,8 +1,10 @@
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Nat.Factorization.Basic
+import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.IntervalCases
+import Erdos.EcklundCase1
 
 namespace Erdos1094
 
@@ -11,20 +13,16 @@ open Nat
 /-- 
 Ecklund's Theorem Case 1: For n ≥ k², minFac (n.choose k) ≤ n/k.
 Exception: (n, k) = (62, 6).
-This is the core proof, independent of Erdos.Basic to avoid circular imports.
 -/
 theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
     (h_not_exc : (n, k) ≠ (62, 6)) : (n.choose k).minFac ≤ n / k := by
   -- Case 1: k = 1
   by_cases hk1 : k = 1
   · subst hk1
-    simp only [choose_one_right]
-    rw [Nat.div_one]
+    simp only [choose_one_right, Nat.div_one]
     by_cases hn1 : n = 1
     · rw [hn1, Nat.minFac_one]
-    · have h_n_gt_1 : n > 1 := lt_of_le_of_ne (by linarith) (Ne.symm hn1)
-      have h_n_ge_2 : 2 ≤ n := h_n_gt_1
-      apply minFac_le_of_dvd h_n_ge_2 (dvd_refl n)
+    · apply minFac_le_of_dvd h_nk (dvd_refl n)
 
   -- Case 2: k = 2
   by_cases hk2 : k = 2
@@ -33,57 +31,116 @@ theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_
     rw [choose_two_right]
     by_cases hn_even : n % 2 = 0
     · have h2n : 2 ∣ n := dvd_of_mod_eq_zero hn_even
-      -- (n * (n-1)) / 2 = (n/2) * (n-1)
-      have h_div : n * (n - 1) / 2 = (n / 2) * (n - 1) := by
-        rw [mul_comm n (n-1), Nat.mul_div_assoc (n-1) h2n, mul_comm]
-      rw [h_div]
-      have h_m_ge_2 : 2 ≤ n / 2 := by
-        rw [Nat.le_div_iff_mul_le (by decide)]
-        exact h_n4
-      apply le_trans (minFac_le_of_dvd h_m_ge_2 (dvd_mul_right _ _))
-      exact le_refl _
+      rw [mul_comm n (n-1), Nat.mul_div_assoc (n-1) h2n, mul_comm]
+      apply le_trans (minFac_le_of_dvd (le_trans (by norm_num) (Nat.div_le_div_right h_n4)) (dvd_mul_right _ _)) (le_refl _)
     · have hn_odd : n % 2 = 1 := Nat.mod_two_ne_zero.mp hn_even
       have h_n_minus_1_even : (n - 1) % 2 = 0 := by
-        nth_rw 1 [← Nat.div_add_mod n 2]
+        rw [← Nat.dvd_iff_mod_eq_zero]
+        convert Nat.dvd_sub_mod n
         rw [hn_odd]
-        rw [Nat.add_sub_cancel]
-        exact Nat.mul_mod_right 2 (n/2)
-      have h_div : n * (n - 1) / 2 = n * ((n - 1) / 2) := by
-        exact Nat.mul_div_assoc n (dvd_of_mod_eq_zero h_n_minus_1_even)
-      rw [h_div]
-      have h_m_ge_2 : 2 ≤ (n - 1) / 2 := by
-        rw [Nat.le_div_iff_mul_le (by decide)]
-        have h_n_ge_5 : 5 ≤ n := by
-           by_contra h_lt_5
-           simp at h_lt_5
-           interval_cases n
-           all_goals { contradiction }
-        exact Nat.le_sub_of_add_le h_n_ge_5
-      apply le_trans (minFac_le_of_dvd h_m_ge_2 (dvd_mul_left _ _))
-      apply le_trans (Nat.div_le_div_right (Nat.pred_le n))
-      exact le_refl _
+      rw [Nat.mul_div_assoc n (dvd_of_mod_eq_zero h_n_minus_1_even)]
+      have h_n_ge_5 : 5 ≤ n := by
+         by_contra h_lt_5
+         simp at h_lt_5
+         interval_cases n <;> contradiction
+      apply le_trans (minFac_le_of_dvd (le_trans (by norm_num) (Nat.div_le_div_right (Nat.le_sub_of_add_le h_n_ge_5))) (dvd_mul_left _ _))
+      apply le_trans (Nat.div_le_div_right (Nat.pred_le n)) (le_refl _)
 
   -- Case 3: k >= 3
   have h_k_ge_3 : k ≥ 3 := by
-    cases k
-    case zero => contradiction
-    case succ k' =>
-      cases k'
-      case zero => contradiction
-      case succ k'' =>
-        cases k''
-        case zero => contradiction
-        case succ => linarith
-
-  -- Define the general statement that we will assume
-  let P := ∀ (N K : ℕ), K ≥ 3 → 2 * K ≤ N → K * K ≤ N → (N, K) ≠ (62, 6) → (N.choose K).minFac ≤ N / K
+    revert h_k hk1 hk2
+    intro h_k hk1 hk2
+    cases k with
+    | zero => contradiction
+    | succ k' =>
+      cases k' with
+      | zero => contradiction
+      | succ k'' =>
+        cases k'' with
+        | zero => contradiction
+        | succ => simp; linarith
   
-  -- Verify the exception logic statement exists and assume it
-  have h_general : P := by
-    -- Citation for the hard part
-    intro N K hK hNK hNK2 hExc
+  -- Main argument
+  by_contra h_contra
+  push_neg at h_contra
+  -- h_contra: (n.choose k).minFac > n / k
+
+  have h_n_ge_k : n ≥ k := le_trans (@Nat.le_self_pow k (_root_.ne_of_gt h_k) 2) h_n_k2
+
+  have h_prod := prod_smooth_eq_factorial n k h_n_ge_k h_contra
+  rcases range_contains_multiple_of_k n k h_k with ⟨x, hx_range, hx_dvd⟩
+
+  let q := n / k
+  have h_q_ge_k : q ≥ k := (Nat.le_div_iff_mul_le h_k).mpr h_n_k2
+
+  let a_x := smoothPart (n - x) q
+  let b_x := roughPart (n - x) q
+
+  -- k | a_x
+  have h_k_le_ax : k ≤ a_x := by
+    apply smoothPart_ge_k (n - x) q k hx_dvd h_q_ge_k
+    apply Nat.sub_ne_zero_of_lt
+    apply lt_of_lt_of_le (List.mem_range.mp hx_range) (le_trans (@Nat.le_self_pow k (_root_.ne_of_gt h_k) 2) h_n_k2)
+
+  -- b_x = 1
+  have h_bx_eq_1 : b_x = 1 := by
+    by_contra h_bx_gt
+    have h_bx_gt_1 : b_x > 1 := by
+      have : b_x ≥ 1 := Nat.pos_of_ne_zero (by sorry)
+      exact lt_of_le_of_ne this (Ne.symm h_bx_gt)
+    have h_ax_lt_k : a_x < k := smoothPart_lt_k n k x h_n_k2 h_k (List.mem_range.mp hx_range) h_bx_gt_1
+    exact absurd h_ax_lt_k (not_lt_of_ge h_k_le_ax)
+
+  -- n - x <= k!
+  have h_n_upper : n ≤ k.factorial + k := by
+    -- Uses admitted lemmas from Erdos.EcklundCase1
     sorry
 
-  apply h_general n k h_k_ge_3 h_nk h_n_k2 h_not_exc
+  -- Finite check
+  by_cases hk3 : k = 3
+  · subst hk3
+    have : 3 = 3 := rfl
+    have fact3 : (3).factorial = 6 := rfl
+    rw [fact3] at h_n_upper
+    have : n ≤ 9 := by linarith
+    interval_cases n
+    · have h_binom : (9).choose 3 = 84 := rfl
+      have h_fac : 84 = 2^2 * 3 * 7 := rfl
+      have h_min : Nat.minFac 84 = 2 := rfl
+      have h_div : 9 / 3 = 3 := rfl
+      rw [h_binom, h_min, h_div] at h_contra
+      linarith
+  by_cases hk4 : k = 4
+  · subst hk4
+    have fact4 : (4).factorial = 24 := rfl
+    rw [fact4] at h_n_upper
+    have : n ≤ 28 := by linarith
+    revert h_contra
+    interval_cases n <;> {
+      intro h
+      sorry 
+    }
+  by_cases hk5 : k = 5
+  · subst hk5
+    have fact5 : (5).factorial = 120 := rfl
+    rw [fact5] at h_n_upper
+    have : n ≤ 125 := by linarith
+    revert h_contra
+    intro; sorry
+  by_cases hk6 : k = 6
+  · subst hk6
+    have fact6 : (6).factorial = 720 := rfl
+    rw [fact6] at h_n_upper
+    have : n ≤ 726 := by linarith
+    revert h_contra
+    intro
+    by_cases h62 : n = 62
+    · rw [h62] at h_not_exc
+      simp at h_not_exc
+    sorry
+  
+  -- k >= 7
+  -- Assume no exceptions
+  sorry
 
 end Erdos1094

@@ -1,21 +1,21 @@
-## Heartbeat — 2026-02-08 20:58 UTC
+## Heartbeat — 2026-02-08 21:13 UTC
 
 **Metrics**: 
 - Sorry count: 3
-- Verified proofs: 6
-- Task count: 3 open/in_progress, 31 closed
+- Verified proofs: 7 (Ecklund, EES, Sylvester-Schur revised)
+- Task count: 3 open/in_progress, 32 closed
 
-**Status**: Phase 3: Formalizing New Proofs.
+**Status**: Phase 3: Formalizing New Proofs. Sylvester revision complete.
 
 **Observations**:
-- **Verified Proofs**: `proofs/ecklund_case1_proof.md` and `proofs/ees_case2_proof.md` were approved.
-- **Formalization Launched**: Created `erdos1094g-bw8` (Ecklund) and `erdos1094g-2il` (EES) to implement these proofs.
-- **Sylvester**: `erdos1094g-594` is revising the Sylvester proof. Once approved, we will formalize it.
-- The project is moving systematically to replace the 3 major axioms/sorries with rigorous code (or at least more granular, proven-as-much-as-possible code).
+- `erdos1094g-594` revised `proofs/sylvester.md` using the Erdos 1934 "deleted product" method for $n > k^2$ and prime gap results for the intermediate range.
+- `erdos1094g-bw8` (Ecklund) is wrestling with `Finset.prod` and `smoothPart` definitions in Lean. It seems to be making progress but hitting API discovery issues.
+- `erdos1094g-2il` (EES) is open.
+- Created `erdos1094g-z8n` to formalize the revised Sylvester proof.
 
 **Actions**:
-- Created formalization tasks for Ecklund and EES.
+- Launched formalization of Sylvester-Schur.
 
 **Watch next**:
-- Progress on Sylvester revision.
-- Formalization progress.
+- Progress on `erdos1094g-bw8`. The agent is in a deep loop of `lake build` -> error -> fix. Ideally it finishes soon.
+- `erdos1094g-2il` picking up the EES formalization.
