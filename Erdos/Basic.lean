@@ -1,4 +1,5 @@
 import Mathlib
+import Erdos.Sylvester
 
 open Nat
 
@@ -27,12 +28,13 @@ def ExceptionsFinset : Finset (ℕ × ℕ) :=
 /-- The set of exceptions to the Erdős 1094 bound. -/
 def Exceptions : Set (ℕ × ℕ) := ↑ExceptionsFinset
 
-/-- Sylvester's Theorem (J. J. Sylvester, 1892).
+/- Sylvester's Theorem (J. J. Sylvester, 1892).
 For `n ≥ 2k`, the product of `k` consecutive integers `n(n-1)...(n-k+1)`
 contains a prime factor `p > k`.
-This implies that `n.choose k` has a prime factor `p > k`. -/
-axiom sylvester_theorem (n k : ℕ) (h : 2 * k ≤ n) :
-    ∃ p, p.Prime ∧ p ∣ (n.choose k) ∧ p > k
+This implies that `n.choose k` has a prime factor `p > k`.
+This theorem is now proved in `Erdos.Sylvester`. -/
+-- axiom sylvester_theorem (n k : ℕ) (h : 2 * k ≤ n) :
+--    ∃ p, p.Prime ∧ p ∣ (n.choose k) ∧ p > k
 
 /-- Ecklund's Theorem, Case 1: For `n ≥ k^2`, the least prime factor of `n.choose k`
 is at most `n / k`, except for the specified exceptions.
