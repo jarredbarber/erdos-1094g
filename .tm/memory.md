@@ -1,29 +1,21 @@
-## Heartbeat — 2026-02-08 20:45 UTC
+## Heartbeat — 2026-02-08 20:53 UTC
 
 **Metrics**: 
-- Sorry count: 3 (Ecklund general case, Sylvester n>2k, EES general case) — *Note: These are currently handled by axioms/sorries that need replacement.*
+- Sorry count: 3 (Ecklund general case, Sylvester n>2k, EES general case)
 - Verified proofs: 4 (Old citation-based proofs)
-- Task count: 3 open, 25 closed
+- Task count: 3 open/in_progress, 25 closed
 
-**Status**: Reopened. Pivot to proof-from-scratch.
+**Status**: Forward-Backward sync. Explore agents are writing new rigorous proofs to replace citation sorries.
 
 **Observations**:
-- **CRITICAL**: Human rejected citation axioms ("incorrectly stated literature results so need to be proven").
-- The project is no longer considered complete.
-- I must replace the 3 citation axioms with formal proofs (or Mathlib imports):
-    1.  Sylvester-Schur ($n > k \implies \exists p > k, p \mid \binom{n}{k}$).
-    2.  Ecklund Case 1 ($n \ge k^2 \implies g(n,k) \le n/k$).
-    3.  EES Case 2 ($2k \le n < k^2 \implies g(n,k) \le k$).
+- `erdos1094g-f49` is creating `proofs/sylvester.md` with Erdos's 1934 proof. The agent correctly identified that the axiom in `Erdos/Sylvester.lean` was flawed (used $n>k$ instead of $n \ge 2k$ or similar bounds) and corrected it to $2k \le n$, which matches the `sylvester_theorem` constraint.
+- `erdos1094g-t6i` and `erdos1094g-eqh` are just starting.
+- The project is in a good state: compilation succeeds (with 3 sorries), and we are systematically replacing the "citation axioms" with "proofs from first principles".
 
 **Actions**:
-- Updated `README.md` to remove "Phase 2 Complete" and mark the project as "In Progress".
-- Created 3 `explore` tasks to prove these theorems rigorously (or find them in Mathlib):
-    - `erdos1094g-f49`: Sylvester-Schur
-    - `erdos1094g-t6i`: Ecklund Case 1
-    - `erdos1094g-eqh`: EES Case 2
-- The goal is to produce verified NL proofs first, then formalize them without using `axiom`.
+- No intervention needed. The explore agents are working correctly.
 
 **Watch next**:
-- Results of the `explore` tasks.
-- If Sylvester-Schur is in Mathlib, that task will close quickly.
-- Ecklund and EES will likely require substantial proof effort.
+- Completion of `erdos1094g-f49` (Sylvester proof).
+- Review of `proofs/sylvester.md`.
+- Once verified, creating a formalize task to replace `axiom sylvester_schur_theorem` with a real proof.
