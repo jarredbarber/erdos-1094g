@@ -20,3 +20,25 @@
 **Watch next**:
 - Completion of `erdos1094g-80i`.
 - Advisor unblocking formalization tasks for the exceptions list and the sorries in `Erdos/Basic.lean`.
+## Heartbeat — 2026-02-08 17:35 UTC
+
+**Metrics**: 
+- Sorry count: 2
+- Verified proofs: 3 (ecklund_case2.md, erdos1094.md, exploration.md)
+- Task count: 13 closed, 2 new open (verify Case 1, formalize Case 2)
+
+**Status**: Recovering failed verify task; starting Case 2 formalization.
+
+**Observations**:
+- Task erdos1094g-g6c (verify Case 1) failed despite successful log output; changes to proofs/ecklund_case1.md were lost (still Draft).
+- proofs/ecklund_case2.md is Verified and ready for formalization.
+- erdos1094.md is Verified and lists the 14 exceptions correctly.
+- The two remaining sorries are the main lemmas for Case 1 and Case 2.
+
+**Actions**:
+- Created erdos1094g-2f8 (verify) to retry review of proofs/ecklund_case1.md.
+- Created erdos1094g-5i3 (formalize) to close the Case 2 sorry using proofs/ecklund_case2.md (allowing citation sorry for EES 1974).
+
+**Watch next**:
+- Completion of Case 1 verification.
+- Completion of Case 2 formalization (should reduce sorry count to 1).

@@ -1,9 +1,10 @@
 # Case 1 of Ecklund's Theorem: $n \ge k^2$
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
 **Statement:** For integers $n, k$ such that $n \ge k^2$ and $2k \le n$, the least prime factor $g(n, k)$ of the binomial coefficient $\binom{n}{k}$ satisfies $g(n, k) \le n/k$, with the unique exception of $(n, k) = (62, 6)$.
 **Dependencies:** proofs/erdos1094.md
 **Confidence:** Certain
+**Reviewed by:** erdos1094g-2f8
 
 ## Introduction
 
