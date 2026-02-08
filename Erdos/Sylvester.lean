@@ -9,6 +9,7 @@ import Mathlib.NumberTheory.PrimeCounting
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Data.Nat.Prime.Factorial
 import Mathlib.Tactic.Zify
+import Mathlib.Data.Finset.Card
 
 namespace Erdos1094
 
@@ -85,6 +86,38 @@ axiom large_k_inequality (k : ℕ) (hk : k ≥ 14) : (k^2 - k)^(k - primeCountin
 axiom small_k_cases (n k : ℕ) (hk : k < 14) (h : 2 * k ≤ n) :
     ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k
 
+lemma primeCounting_lt_self (k : ℕ) (hk : 2 ≤ k) : Nat.primeCounting k < k := by
+  rw [Nat.primeCounting]
+  rw [← Nat.primesBelow_card_eq_primeCounting']
+  let s := range (k + 1)
+  have h_card_s : s.card = k + 1 := card_range (k + 1)
+  
+  let p := filter Nat.Prime s
+  have h_sub : p ⊆ s.erase 0 \ {1} := by
+    intro x hx
+    rw [mem_filter] at hx
+    rw [mem_sdiff, mem_singleton, mem_erase]
+    refine ⟨⟨?_, hx.1⟩, ?_⟩
+    · rintro rfl; exact Nat.not_prime_zero hx.2
+    · rintro rfl; exact Nat.not_prime_one hx.2
+
+  have h_card : p.card ≤ (s.erase 0 \ {1}).card := card_le_card h_sub
+  
+  have h_sub_1 : {1} ⊆ s.erase 0 := by
+    rw [singleton_subset_iff, mem_erase]
+    refine ⟨zero_ne_one.symm, mem_range.mpr (lt_trans (lt_of_lt_of_le one_lt_two hk) (lt_add_one k))⟩
+  
+  rw [card_sdiff] at h_card
+  rw [inter_comm, inter_eq_right.mpr h_sub_1] at h_card
+  rw [card_singleton] at h_card
+  
+  rw [card_erase_of_mem (mem_range.mpr (succ_pos k))] at h_card
+  rw [h_card_s] at h_card
+  
+  simp only [add_tsub_cancel_right] at h_card
+  apply lt_of_le_of_lt h_card
+  exact Nat.pred_lt (Nat.ne_of_gt (lt_of_lt_of_le zero_lt_two hk))
+
 /-- Sylvester-Schur Theorem (J. J. Sylvester, 1892; I. Schur, 1929).
     For n ≥ 2k, the binomial coefficient n.choose k has a prime factor p > k.
     This generalizes Bertrand's Postulate (which is the case n = 2k).
@@ -112,22 +145,26 @@ theorem sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) :
            rw [mem_Ico] at h_in
            have : k ≤ k^2 := by simp [pow_two, Nat.le_mul_self]
            have : k^2 - k + 1 ≤ n - k + 1 := by
-             -- n > k^2 => n >= k^2 + 1
-             -- n - k + 1 >= k^2 + 1 - k + 1 = k^2 - k + 2
-             -- k^2 - k + 1 <= k^2 - k + 2
-             sorry
+             have h_n_ge : n ≥ k^2 + 1 := succ_le_of_lt h_large
+             omega
            exact le_trans this h_in.1
 
          have h_card_pos : S.card > 0 := by
            calc S.card ≥ k - primeCounting k := hS_card
-                _ > 0 := sorry -- k - pi(k) >= 1
+                _ > 0 := Nat.sub_pos_of_lt (primeCounting_lt_self k (le_trans (by decide) h14))
 
          calc ∏ x ∈ S, x ≥ ∏ x ∈ S, (k^2 - k + 1) := Finset.prod_le_prod (fun _ _ => Nat.zero_le _) (fun x hx => h_term x hx)
               _ = (k^2 - k + 1) ^ S.card := Finset.prod_const (k^2 - k + 1)
               _ > (k^2 - k) ^ S.card := by
-                 apply Nat.pow_lt_pow_left (by sorry) (Nat.ne_of_gt h_card_pos)
+                 apply Nat.pow_lt_pow_left (lt_succ_self _) (Nat.ne_of_gt h_card_pos)
               _ ≥ (k^2 - k) ^ (k - primeCounting k) := by
-                 apply Nat.pow_le_pow_right (by sorry) hS_card
+                 apply Nat.pow_le_pow_right _ hS_card
+                 -- Prove 0 < k^2 - k
+                 rw [sq]
+                 apply Nat.sub_pos_of_lt
+                 have hk : k > 1 := lt_of_lt_of_le (by decide) h14
+                 conv_lhs => rw [← mul_one k]
+                 exact Nat.mul_lt_mul_of_pos_left hk (lt_trans zero_lt_one hk)
               _ > k.factorial := large_k_inequality k h14
          
       have h_upper : ∏ x ∈ S, x ≤ k.factorial := le_of_dvd (factorial_pos k) hS_dvd

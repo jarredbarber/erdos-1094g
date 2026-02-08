@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Closed sorry in verify_large_k. lake build Erdos.EES1974 succeeds.",
-  "details": "Implemented check_kummer_bound using digit sum property from Kummer's theorem. Verified k in [29, 166] using native_decide. Used axiom ees_large_k for k >= 167 as per instructions."
+  "summary": "Closed 4 sorries in Erdos/Sylvester.lean and added primeCounting_lt_self lemma.",
+  "details": "Implemented primeCounting_lt_self (pi(k) < k for k>=2) to prove S.card > 0. Used omega and manual arithmetic proofs to close the remaining inequalities: k^2 - k + 1 <= n - k + 1 and k^2 - k > 0. The file now compiles without sorries (except axioms)."
 }
