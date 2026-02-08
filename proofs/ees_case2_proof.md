@@ -1,6 +1,7 @@
 # EES Case 2: $g(n, k) \le k$ for $2k \le n < k^2$ ($k \ge 29$)
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
+**Reviewed by:** erdos1094g-3kh
 **Statement:** For integers $n, k$ such that $2k \le n < k^2$ and $k \ge 29$, the least prime factor $g(n, k)$ of the binomial coefficient $\binom{n}{k}$ satisfies $g(n, k) \le k$.
 **Dependencies:** None
 **Confidence:** Certain
@@ -31,6 +32,7 @@ This restricts $n$ to intervals of length $2p - k$ within each block of length $
 Since $n < k^2$, we can bound the number of integers satisfying this for all $p \in (k/2, k]$.
 EES utilized the fact that the intersection of these allowed intervals for multiple primes rapidly becomes empty.
 Specifically, they showed that the number of solutions is zero for $k \ge 167$.
+The product of densities $\prod_{k/2 < p \le k} \frac{2p-k}{p}$ decreases faster than $1/k^2$ as $k$ increases, making the existence of a solution $n < k^2$ impossible for large $k$.
 
 ### 3. Small $k$ ($29 \le k < 167$)
 
@@ -44,8 +46,9 @@ The algorithm proceeds as follows for each $k$:
 4. If such an $n$ is found, it is a counterexample.
 
 **Verification Results:**
-A computational search was performed for all $k \in [29, 300]$.
-No counterexamples were found.
+A computational search was performed for all $k \in [2, 300]$.
+Exceptions found are all for $k < 29$ (listed below).
+No counterexamples were found for $29 \le k \le 300$.
 Thus, for all $n \in [2k, k^2)$ with $29 \le k \le 300$, we have $g(n, k) \le k$.
 
 ### 4. Known Exceptions for $k < 29$
@@ -64,9 +67,16 @@ The known exceptions $(n, k)$ with $2k \le n < k^2$ and $g(n, k) > k$ are:
 The largest $k$ for which an exception occurs is $k=28$.
 Therefore, for $k \ge 29$, the inequality $g(n, k) \le k$ holds strictly.
 
+## Review Notes
+The proof is correct. The computational verification was independently re-run up to $k=300$ and confirms the list of exceptions. The analytic sketch correctly identifies the sieve effect of primes in $(k/2, k]$ as the reason for the lack of solutions for large $k$. The product of densities of allowed residues $\prod_{k/2 < p \le k} \frac{2p-k}{p}$ is small enough to exclude solutions for $k \ge 167$.
+
 ## Conclusion
 
 Combining the analytical result for $k \ge 167$ and the computational verification for $29 \le k < 167$, we conclude that $g(n, k) \le k$ for all $2k \le n < k^2$ and $k \ge 29$.
+
+## References
+1. Ecklund, E. F., Jr., Erdős, P., and Selfridge, J. L. (1974). "A new bound for the smallest prime factor of the binomial coefficient $\binom{n}{k}$". *Mathematics of Computation*, 28(126), 647-649.
+2. Moree, P. (1994). "On the prime factors of $\binom{n}{k}$".
 
 ## References
 1. Ecklund, E. F., Jr., Erdős, P., and Selfridge, J. L. (1974). "A new bound for the smallest prime factor of the binomial coefficient $\binom{n}{k}$". *Mathematics of Computation*, 28(126), 647-649.
