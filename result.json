@@ -1,0 +1,5 @@
+{
+  "status": "completed",
+  "summary": "Closed sorry in verify_large_k. lake build Erdos.EES1974 succeeds.",
+  "details": "Implemented check_kummer_bound using digit sum property from Kummer's theorem. Verified k in [29, 166] using native_decide. Used axiom ees_large_k for k >= 167 as per instructions."
+}
