@@ -689,3 +689,79 @@ $ rm verify_exceptions.py search_exceptions.py
 - (241, 16): g(241, 16) = 17 > 16
 - (284, 28): g(284, 28) = 29 > 28
 A computational search for k < 40 confirmed that no other exceptions exist in that range. The proof file has been updated to 'Verified ✅' status and includes a Reviewer's Verification section summarizing these findings.
+[2026-02-08T15:55:56.796Z] ✅ Successfully merged task/erdos1094g-80i into main
+[2026-02-08T15:55:56.798Z] 🗑️  Deleting branch task/erdos1094g-80i...
+[2026-02-08T15:55:56.803Z] ✓ Deleted local branch task/erdos1094g-80i
+[2026-02-08T15:55:56.807Z] 🚀 Pushing main to remote...
+[2026-02-08T15:55:57.366Z] ✓ Pushed to remote
+[2026-02-08T15:55:58.368Z] 
+================================================================================
+[2026-02-08T15:55:58.368Z] 📌 Processing task: erdos1094g-22s - Advisor: Planning formalization of 14 exceptions
+[2026-02-08T15:55:58.368Z]    Role: advisor | Priority: 1 | Size: medium
+[2026-02-08T15:55:58.368Z] ================================================================================
+
+[2026-02-08T15:55:58.370Z] ✓ Claimed task erdos1094g-22s
+
+[2026-02-08T15:55:58.370Z] 🤖 Using agent: advisor with models: google-antigravity/gemini-3-pro:high
+
+[2026-02-08T15:55:58.370Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro:high...
+[2026-02-08T15:55:58.382Z] 📸 Capturing file state before agent execution...
+[2026-02-08T15:55:58.392Z] ✓ Captured state: 32 tracked, 1 untracked files
+
+[2026-02-08T15:55:58.392Z] 🌿 Creating branch: task/erdos1094g-22s
+[2026-02-08T15:55:58.396Z] ✓ Working on branch task/erdos1094g-22s
+
+[2026-02-08T15:56:00.606Z] 
+$ ls proofs/
+[2026-02-08T15:56:02.293Z] 
+$ tm list
+[2026-02-08T15:56:05.543Z] 
+$ tm get erdos1094g-80i
+[2026-02-08T15:56:09.172Z] 
+$ grep -rn sorry *.lean **/*.lean 2>/dev/null | grep -v '.lake/'
+[2026-02-08T15:56:10.628Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:56:12.953Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:56:25.044Z] 
+🛠️  Executing tool: read...
+[2026-02-08T15:56:34.230Z] 
+$ tm update erdos1094g-22s --status "Updating ExceptionsFinset and lemma signatures in Erdos/Basic.lean"
+[2026-02-08T15:56:46.630Z] 
+🛠️  Executing tool: edit...
+[2026-02-08T15:56:52.880Z] 
+$ tm create -t "Formalize exception_violation lemma via computation" -r formalize -p 1 -d "Prove the exception_violation lemma in Erdos/Basic.lean by computationally verifying g(n, k) > max (n/k) k for all 14 pairs in ExceptionsFinset. Use Kummer's theorem (or just Nat.minFac) to compute g(n, k)."
+[2026-02-08T15:56:57.607Z] 
+$ tm create -t "Prove: for n >= k^2 and 2k <= n, g(n, k) <= k except (62, 6)" -r explore -p 2 -d "Provide a detailed natural language proof for Case 1 of Ecklund's theorem: if n >= k^2 and 2k <= n, then the least prime factor g(n, k) of C(n, k) is at most k, with the unique exception (62, 6). Reference Ecklund (1969)."
+[2026-02-08T15:57:02.552Z] 
+$ tm create -t "Prove: for 2k <= n < k^2, g(n, k) <= k except for 13 specific cases" -r explore -p 2 -d "Provide a detailed natural language proof for Case 2: if 2k <= n < k^2, then g(n, k) <= k with exactly 13 exceptions (all listed in proofs/erdos1094.md except 62,6). Reference Ecklund, Erdős, Selfridge (1974)."
+[2026-02-08T15:57:14.178Z] 
+$ tm create -t "Review Case 1 NL proof" -r verify -p 2 --deps erdos1094g-f76 -d "Review the natural language proof for Case 1 (n >= k^2). Check for correctness and completeness against Ecklund (1969)."
+tm create -t "Review Case 2 NL proof" -r verify -p 2 --deps erdos1094g-dam -d "Review the natural language proof for Case 2 (2k <= n < k^2). Check for correctness and completeness against Ecklund, Erdős, Selfridge (1974)."
+[2026-02-08T15:57:20.897Z] 
+
+📝 Agent response complete.
+
+[2026-02-08T15:57:20.897Z] 📄 Log saved to .tm/logs/worker-erdos1094g-22s.md
+[2026-02-08T15:57:20.897Z] 
+📊 Task erdos1094g-22s completed:
+[2026-02-08T15:57:20.897Z]    Summary: Updated Erdos/Basic.lean with 14 exceptions and proper lemma signatures; created 5 follow-up tasks for formalization and exploration.
+[2026-02-08T15:57:20.897Z]    Details: The following actions were performed:
+1.  **Updated `Erdos/Basic.lean`**:
+    - Expanded `ExceptionsFinset` from 7 to 14 pairs based on `proofs/erdos1094.md`.
+    - Updated `least_prime_factor_le_k_of_n_ge_k2` to include the `(n, k) ∉ Exceptions` condition, as (62, 6) is a known exception in this region.
+    - Updated `erdos_1094_explicit` and `erdos_1094` theorems to maintain consistency with the new exceptions and lemma signatures.
+
+2.  **Gap Analysis**:
+    - The Lean skeleton is now correctly aligned with the known mathematical results.
+    - The primary gap is the proof of the two main cases: Case 1 ($n \ge k^2$) and Case 2 ($2k \le n < k^2$). These correspond to significant papers (Ecklund 1869, Ecklund et al. 1974).
+    - Computational verification of the 14 exceptions is also needed to close the `exception_violation` sorry.
+
+3.  **Task Creation**:
+    - `erdos1094g-z09`: Formalize `exception_violation` lemma via computation (formalize).
+    - `erdos1094g-f76`: Provide detailed NL proof for Case 1 ($n \ge k^2$) (explore).
+    - `erdos1094g-dam`: Provide detailed NL proof for Case 2 ($2k \le n < k^2$) (explore).
+    - `erdos1094g-g6c`: Review Case 1 NL proof (verify).
+    - `erdos1094g-41u`: Review Case 2 NL proof (verify).
+
+The formalization of Case 1 and Case 2 will follow once the NL proofs are verified.

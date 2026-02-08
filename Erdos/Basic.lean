@@ -21,7 +21,8 @@ def g (n k : ℕ) : ℕ := (n.choose k).minFac
 
 /-- The list of exceptions to the Erdős 1094 bound. -/
 def ExceptionsFinset : Finset (ℕ × ℕ) :=
-  {(7, 3), (13, 4), (14, 4), (23, 5), (44, 8), (46, 10), (47, 11)}
+  {(7, 3), (13, 4), (14, 4), (23, 5), (62, 6), (44, 8), (46, 10), (47, 10),
+   (74, 10), (94, 10), (95, 10), (47, 11), (241, 16), (284, 28)}
 
 /-- The set of exceptions to the Erdős 1094 bound. -/
 def Exceptions : Set (ℕ × ℕ) := ↑ExceptionsFinset
@@ -34,9 +35,9 @@ axiom sylvester_theorem (n k : ℕ) (h : k < n) :
     ∃ p, p.Prime ∧ p ∣ (n.choose k) ∧ p > k
 
 /-- Ecklund's Theorem, Case 1: For `n ≥ k^2`, the least prime factor of `n.choose k`
-is at most `k`. -/
-lemma least_prime_factor_le_k_of_n_ge_k2 (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n) :
-    g n k ≤ k := by
+is at most `k`, except for the specified exceptions. -/
+lemma least_prime_factor_le_k_of_n_ge_k2 (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
+    (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ k := by
   sorry
 
 /-- Ecklund's Theorem, Case 2: For `2k ≤ n < k^2`, the least prime factor of `n.choose k`
@@ -52,11 +53,11 @@ lemma exception_violation (n k : ℕ) (h : (n, k) ∈ Exceptions) :
 
 /-- The main result: Erdős 1094.
 For `n ≥ 2k`, the least prime factor of `n.choose k` is at most `max (n/k) k`,
-unless `(n, k)` is one of the 7 exceptions. -/
+unless `(n, k)` is one of the 14 exceptions. -/
 theorem erdos_1094_explicit (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n)
     (h_not_exc : (n, k) ∉ Exceptions) : g n k ≤ max (n / k) k := by
   by_cases h_case : k * k ≤ n
-  · have h_le_k := least_prime_factor_le_k_of_n_ge_k2 n k h_nk h_case
+  · have h_le_k := least_prime_factor_le_k_of_n_ge_k2 n k h_nk h_case h_not_exc
     have : k ≤ n / k := (Nat.le_div_iff_mul_le h_k).mpr h_case
     have : k ≤ max (n / k) k := le_max_of_le_left this
     exact h_le_k.trans this
