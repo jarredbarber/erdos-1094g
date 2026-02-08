@@ -1,6 +1,7 @@
 # Ecklund Case 1: $g(n,k) \le n/k$ for $n \ge k^2$
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
+**Reviewed by:** erdos1094g-9s8
 **Statement:** Let $g(n, k)$ be the least prime factor of $\binom{n}{k}$. If $n \ge k^2$, then $g(n, k) \le n/k$, with the single exception $(n, k) = (62, 6)$.
 **Dependencies:** None
 **Confidence:** High
