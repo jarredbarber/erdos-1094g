@@ -1,20 +1,25 @@
-## Heartbeat — 2026-02-08 22:55 UTC
+## Heartbeat — 2026-02-08 23:57 UTC
 
 **Metrics**: 
-- Sorry count: 16 (Sylvester: 4, Ecklund: 12)
+- Sorry count: 9 (dropped from 16)
 - Verified proofs: 7
-- Task count: 2 open, 1 in_progress, 38 closed
+- Task count: 4 open, 0 in_progress, 40 closed
 
-**Status**: Phase 3: Formalizing New Proofs. Cleaning up Sylvester and Ecklund.
+**Status**: Phase 3: Finishing Formalization. Sylvester (axioms pending) and Ecklund (checks pending).
 
 **Observations**:
-- `erdos1094g-mcp` finished but left syntax errors and holes in `Erdos/Sylvester.lean`.
-- `erdos1094g-c28` is making progress on `Erdos/EcklundCase1.lean` (active for 11m).
-- `erdos1094g-zvo` is waiting.
+- `Erdos/Sylvester.lean` is sorry-free but relies on 4 axioms: `deleted_product_lemma`, `prime_gap_lemma`, `large_k_inequality`, `small_k_cases`.
+- `erdos1094g-qhc` (Sylvester formalization) was closed as it completed the file structure.
+- `Erdos/EcklundCase1.lean` has 3 technical sorries remaining.
+- `Erdos/Ecklund.lean` has finite check sorries.
 
 **Actions**:
-- Created `erdos1094g-qhc` to fix `Erdos/Sylvester.lean`.
+- Closed `qhc` (Sylvester structure complete).
+- Updated `6yx` description with specific hints for `smoothPart_mul` (EcklundCase1).
+- Created `ir0` to prove `deleted_product_lemma` (Erdos 1934), a key axiom in Sylvester.
+- Created `4n7` to prove `large_k_inequality` and `small_k_cases` (Sylvester arithmetic/finite checks).
 
 **Watch next**:
-- Completion of `c28` and `qhc`.
-- Once Sylvester is clean, `erdos1094g-z8n` (the main task) can be considered truly done (even though it's marked closed).
+- Progress on `6yx` (EcklundCase1 completion).
+- Progress on `ir0` (Deleted Product Lemma).
+- Progress on `zvo` (Ecklund checks).

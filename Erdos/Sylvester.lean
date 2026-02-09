@@ -87,36 +87,37 @@ axiom small_k_cases (n k : ℕ) (hk : k < 14) (h : 2 * k ≤ n) :
     ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k
 
 lemma primeCounting_lt_self (k : ℕ) (hk : 2 ≤ k) : Nat.primeCounting k < k := by
-  rw [Nat.primeCounting]
-  rw [← Nat.primesBelow_card_eq_primeCounting']
-  let s := range (k + 1)
-  have h_card_s : s.card = k + 1 := card_range (k + 1)
+  rw [Nat.primeCounting, ← Nat.primesBelow_card_eq_primeCounting']
+  let primes := Nat.primesBelow (k + 1)
+  let s := Finset.range (k + 1)
   
-  let p := filter Nat.Prime s
-  have h_sub : p ⊆ s.erase 0 \ {1} := by
+  have h_primes_eq : primes = s.filter Nat.Prime := rfl
+  
+  have h_subset : primes ⊆ s \ {0, 1} := by
     intro x hx
-    rw [mem_filter] at hx
-    rw [mem_sdiff, mem_singleton, mem_erase]
-    refine ⟨⟨?_, hx.1⟩, ?_⟩
+    rw [h_primes_eq, Finset.mem_filter] at hx
+    simp only [Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton, not_or]
+    refine ⟨hx.1, ?_⟩
+    constructor
     · rintro rfl; exact Nat.not_prime_zero hx.2
     · rintro rfl; exact Nat.not_prime_one hx.2
+    
+  have h_sub_01 : {0, 1} ⊆ s := by
+    rw [Finset.insert_subset_iff, Finset.singleton_subset_iff]
+    constructor
+    · exact Finset.mem_range.mpr (lt_trans (by decide) (lt_of_le_of_lt hk (lt_add_one k)))
+    · exact Finset.mem_range.mpr (lt_of_le_of_lt (le_trans (by decide) hk) (lt_add_one k))
 
-  have h_card : p.card ≤ (s.erase 0 \ {1}).card := card_le_card h_sub
+  have h_card_le : primes.card ≤ (s \ {0, 1}).card := Finset.card_le_card h_subset
   
-  have h_sub_1 : {1} ⊆ s.erase 0 := by
-    rw [singleton_subset_iff, mem_erase]
-    refine ⟨zero_ne_one.symm, mem_range.mpr (lt_trans (lt_of_lt_of_le one_lt_two hk) (lt_add_one k))⟩
+  rw [Finset.card_sdiff] at h_card_le
+  rw [Finset.inter_eq_left.mpr h_sub_01] at h_card_le
+  rw [Finset.card_insert_of_notMem (by simp), Finset.card_singleton] at h_card_le
+  rw [Finset.card_range] at h_card_le
   
-  rw [card_sdiff] at h_card
-  rw [inter_comm, inter_eq_right.mpr h_sub_1] at h_card
-  rw [card_singleton] at h_card
-  
-  rw [card_erase_of_mem (mem_range.mpr (succ_pos k))] at h_card
-  rw [h_card_s] at h_card
-  
-  simp only [add_tsub_cancel_right] at h_card
-  apply lt_of_le_of_lt h_card
-  exact Nat.pred_lt (Nat.ne_of_gt (lt_of_lt_of_le zero_lt_two hk))
+  calc primes.card ≤ (k + 1) - 2 := h_card_le
+       _ = k - 1 := by apply Nat.sub_eq_of_eq_add; omega
+       _ < k := Nat.pred_lt (Nat.ne_of_gt (lt_of_lt_of_le zero_lt_two hk))
 
 /-- Sylvester-Schur Theorem (J. J. Sylvester, 1892; I. Schur, 1929).
     For n ≥ 2k, the binomial coefficient n.choose k has a prime factor p > k.
