@@ -152,13 +152,31 @@ theorem verify_kummer_range_imp (k : ℕ) (h_verify : verify_kummer_range k = tr
   apply check_kummer_bound_imp_le n k _ h_verify
   linarith
 
-/-- Combined verification for k ∈ [29, 166]. -/
-def verify_ees_29_166 : Bool :=
-  (List.range (166 - 29 + 1)).all fun i =>
+/-- Combined verification for k ∈ [29, 79]. -/
+def verify_ees_29_79 : Bool :=
+  (List.range (79 - 29 + 1)).all fun i =>
     let k := 29 + i
     verify_kummer_range k
 
-theorem verify_ees_29_166_true : verify_ees_29_166 = true := by
+theorem verify_ees_29_79_true : verify_ees_29_79 = true := by
+  native_decide
+
+/-- Combined verification for k ∈ [80, 129]. -/
+def verify_ees_80_129 : Bool :=
+  (List.range (129 - 80 + 1)).all fun i =>
+    let k := 80 + i
+    verify_kummer_range k
+
+theorem verify_ees_80_129_true : verify_ees_80_129 = true := by
+  native_decide
+
+/-- Combined verification for k ∈ [130, 166]. -/
+def verify_ees_130_166 : Bool :=
+  (List.range (166 - 130 + 1)).all fun i =>
+    let k := 130 + i
+    verify_kummer_range k
+
+theorem verify_ees_130_166_true : verify_ees_130_166 = true := by
   native_decide
 
 /-- Combined verification for k ∈ [167, 199]. -/

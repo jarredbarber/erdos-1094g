@@ -41,21 +41,44 @@ theorem verify_small_k (k : ℕ) (hk : k ≤ 28) (hk2 : 2 * k < k * k) : case2_p
   all_goals { native_decide }
 
 theorem verify_mid_k (k : ℕ) (h_low : 29 ≤ k) (h_high : k ≤ 166) : verify_kummer_range k = true := by
-  have h := verify_ees_29_166_true
-  rw [verify_ees_29_166, List.all_eq_true] at h
-  let i := k - 29
-  have h_range_len : 166 - 29 + 1 = 138 := by rfl
-  have h_idx : i < 138 := by
-    rw [← h_range_len]
-    apply Nat.lt_succ_of_le
-    apply Nat.sub_le_sub_right h_high
-  have h_mem : i ∈ List.range (166 - 29 + 1) := by
-    rw [h_range_len]
-    exact List.mem_range.mpr h_idx
-  specialize h i h_mem
-  have h_k : 29 + i = k := Nat.add_sub_of_le h_low
-  rw [h_k] at h
-  exact h
+  if h_k_79 : k ≤ 79 then
+    have h := verify_ees_29_79_true
+    rw [verify_ees_29_79, List.all_eq_true] at h
+    let i := k - 29
+    have h_mem : i ∈ List.range (79 - 29 + 1) := by
+      rw [List.mem_range]
+      apply Nat.lt_succ_of_le
+      exact Nat.sub_le_sub_right h_k_79 29
+    specialize h i h_mem
+    have h_k : 29 + i = k := Nat.add_sub_of_le h_low
+    rw [h_k] at h
+    exact h
+  else if h_k_129 : k ≤ 129 then
+    have h_low' : 80 ≤ k := by linarith
+    have h := verify_ees_80_129_true
+    rw [verify_ees_80_129, List.all_eq_true] at h
+    let i := k - 80
+    have h_mem : i ∈ List.range (129 - 80 + 1) := by
+      rw [List.mem_range]
+      apply Nat.lt_succ_of_le
+      exact Nat.sub_le_sub_right h_k_129 80
+    specialize h i h_mem
+    have h_k : 80 + i = k := Nat.add_sub_of_le h_low'
+    rw [h_k] at h
+    exact h
+  else
+    have h_low'' : 130 ≤ k := by linarith
+    have h := verify_ees_130_166_true
+    rw [verify_ees_130_166, List.all_eq_true] at h
+    let i := k - 130
+    have h_mem : i ∈ List.range (166 - 130 + 1) := by
+      rw [List.mem_range]
+      apply Nat.lt_succ_of_le
+      exact Nat.sub_le_sub_right h_high 130
+    specialize h i h_mem
+    have h_k : 130 + i = k := Nat.add_sub_of_le h_low''
+    rw [h_k] at h
+    exact h
 
 theorem verify_high_k (k : ℕ) (h_low : 167 ≤ k) (h_high : k ≤ 299) : verify_kummer_range k = true := by
   if hk1 : k ≤ 199 then
