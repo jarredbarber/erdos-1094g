@@ -16,8 +16,10 @@ open Nat
 /-- 
 Ecklund's Theorem Case 1: For n ≥ k², minFac (n.choose k) ≤ n/k.
 Exception: (n, k) = (62, 6).
+This axiom covers the large cases ($k \ge 11$) which are proven analytically in Ecklund (1969).
+For $k \le 10$, we verify computationally.
 -/
-axiom ecklund_case1_ge_8 (n k : ℕ) (h_k : 8 ≤ k) (h_nk : k * k ≤ n) : (n.choose k).minFac ≤ n / k
+axiom ecklund_case1_ge_11 (n k : ℕ) (h_k : 11 ≤ k) (h_nk : k * k ≤ n) : (n.choose k).minFac ≤ n / k
 
 theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
     (h_not_exc : (n, k) ≠ (62, 6)) : (n.choose k).minFac ≤ n / k := by
@@ -168,12 +170,28 @@ theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_
     linarith
 
   -- k >= 8
-  have h_k_ge_8 : k ≥ 8 := by
-    by_contra h_lt_8
-    simp at h_lt_8
+  by_cases hk8 : k = 8
+  · subst hk8
+    have h_check := verify_range_correct 8 verify_k8_range n h_n_k2 h_n_upper
+    linarith
+
+  by_cases hk9 : k = 9
+  · subst hk9
+    have h_check := verify_range_correct 9 verify_k9_range n h_n_k2 h_n_upper
+    linarith
+
+  by_cases hk10 : k = 10
+  · subst hk10
+    have h_check := verify_range_correct 10 verify_k10_range n h_n_k2 h_n_upper
+    linarith
+
+  -- k >= 11
+  have h_k_ge_11 : k ≥ 11 := by
+    by_contra h_lt_11
+    simp at h_lt_11
     interval_cases k <;> contradiction
 
-  have h_res := ecklund_case1_ge_8 n k h_k_ge_8 h_n_k2
+  have h_res := ecklund_case1_ge_11 n k h_k_ge_11 h_n_k2
   linarith
 
 end Erdos1094
