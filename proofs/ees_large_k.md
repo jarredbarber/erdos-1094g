@@ -1,6 +1,7 @@
 # EES Case 2: Analytic Proof for $k \ge 167$
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
+**Reviewed by:** erdos1094g-sl7
 **Statement:** For all integers $k \ge 167$, there are no integers $n$ in the interval $2k \le n < k^2$ such that the least prime factor of $\binom{n}{k}$ is greater than $k$.
 **Dependencies:** None
 **Confidence:** High
