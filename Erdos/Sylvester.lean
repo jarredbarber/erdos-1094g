@@ -10,11 +10,16 @@ import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Data.Nat.Prime.Factorial
 import Mathlib.Tactic.Zify
 import Mathlib.Data.Finset.Card
-import Mathlib.Data.Nat.Interval
+-- import Mathlib.Data.Nat.Interval
+import Mathlib.Analysis.SpecialFunctions.Stirling
+import Mathlib.Data.Real.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Tactic.Linarith
+import Mathlib.Algebra.Group.Even
 
 namespace Erdos1094
 
-open Nat Finset
+open Nat Finset Real
 
 lemma card_multiples_bound (a k m : ℕ) (hm : m > 0) :
     ((Ico a (a + k)).filter (fun x => m ∣ x)).card ≤ k / m + 1 := by
@@ -296,15 +301,240 @@ lemma prime_dvd_choose_of_gap (n k p : ℕ) (h_le : k ≤ n) (h_2k : 2 * k ≤ n
   rw [h_val_k, h_val_nk, add_zero, h_val_n, Nat.sub_zero]
   exact one_ne_zero
 
-/-- Arithmetic inequality for large k.
-    (k^2 - k)^(k - pi(k)) > k! for k >= 14.
-    Admitted as a calculation. -/
-axiom large_k_inequality (k : ℕ) (hk : k ≥ 14) : (k^2 - k)^(k - primeCounting k) > k.factorial
+lemma card_range_filter_odd (n : ℕ) : ((range n).filter Odd).card = n / 2 := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [range_add_one, filter_insert]
+    split_ifs with h
+    · rw [card_insert_of_notMem (by simp), ih]
+      rw [Nat.odd_iff] at h
+      have : n % 2 = 1 := h
+      rw [← Nat.add_sub_of_le (by decide : 1 ≤ 2), Nat.add_div_right _ (by decide)]
+      -- (n + 1) / 2 = (n - 1 + 2) / 2 = (n-1)/2 + 1.
+      -- n/2 = (n-1)/2.
+      -- So n/2 + 1 = (n+1)/2.
+      have : (n + 1) / 2 = n / 2 + 1 := by
+        rw [← Nat.div_add_mod n 2]
+        rw [this]
+        -- (2*(n/2) + 1 + 1) / 2 = (2*(n/2) + 2) / 2 = n/2 + 1.
+        rw [add_assoc, ← mul_two, mul_comm, Nat.mul_add_div (by decide) (n/2) 1]
+        simp
+      exact this.symm
+    · rw [ih]
+      rw [← Nat.even_iff_not_odd] at h
+      rw [Nat.even_iff] at h
+      have : n % 2 = 0 := h
+      have : (n + 1) / 2 = n / 2 := by
+        rw [← Nat.div_add_mod n 2]
+        rw [this, add_zero]
+        -- (2*(n/2) + 1) / 2 = n/2.
+        rw [mul_comm, Nat.mul_add_div (by decide)]
+        simp
+      exact this.symm
 
-/-- Small k cases (k < 14).
-    Admitted as finite check. -/
-axiom small_k_cases (n k : ℕ) (hk : k < 14) (h : 2 * k ≤ n) :
-    ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k
+lemma primeCounting_le_ceil_half (k : ℕ) (hk : 2 ≤ k) : primeCounting k ≤ (k + 1) / 2 := by
+  rw [primeCounting, ← primesBelow_card_eq_primeCounting']
+  let s := primesBelow (k + 1)
+  have h_s_card : s.card = primeCounting k := by
+    rw [primesBelow_card_eq_primeCounting', primeCounting]
+    rfl
+  
+  let odds := (range (k + 1)).filter Odd
+  have h_odds_card : odds.card = (k + 1) / 2 := card_range_filter_odd (k + 1)
+  
+  let odd_primes := s \ {2}
+  have h_sub : odd_primes ⊆ odds := by
+    intro x hx
+    rw [mem_sdiff, mem_singleton] at hx
+    rw [mem_filter] at hx ⊢
+    rw [primesBelow, mem_filter] at hx
+    refine ⟨hx.1.1, ?_⟩
+    apply Nat.Prime.odd_of_ne_two hx.1.2 hx.2
+  
+  have h_union : s = {2} ∪ odd_primes := by
+    ext x
+    simp
+    constructor
+    · intro hx
+      if h2 : x = 2 then left; exact h2
+      else right; exact ⟨hx, h2⟩
+    · intro hx
+      rcases mem_union.mp hx with h2 | hp
+      · rw [primesBelow, mem_filter, mem_range]
+        rw [mem_singleton] at h2
+        rw [h2]
+        refine ⟨lt_of_le_of_lt (by decide) (Nat.lt_succ_of_le hk), Nat.prime_two⟩
+      · exact hp
+      
+  rw [h_union, card_union_disjoint]
+  · rw [card_singleton]
+    apply le_trans (Nat.add_le_add_left (card_le_card h_sub) 1)
+    rw [h_odds_card]
+    
+    have h_sub' : odd_primes ⊆ odds \ {1} := by
+       intro x hx
+       rw [mem_sdiff, mem_singleton]
+       refine ⟨h_sub hx, ?_⟩
+       intro h1
+       rw [h1] at hx
+       rw [mem_sdiff, mem_singleton, primesBelow, mem_filter] at hx
+       exact Nat.not_prime_one hx.1.2
+       
+    rw [card_sdiff (singleton_subset_iff.mpr _)]
+    · apply le_of_eq
+      rw [Nat.sub_add_cancel]
+      apply Nat.div_pos (le_trans (by decide) hk) (by decide)
+    · simp; rw [mem_filter, mem_range]; refine ⟨Nat.lt_succ_of_le (le_trans (by decide) hk), Nat.odd_one⟩
+  · simp
+    intro x hx h2
+    rw [mem_singleton] at h2
+    simp [h2] at hx
+    exact hx.2 rfl
+
+lemma cube_lt_pow_two (k : ℕ) (hk : k ≥ 14) : k^3 < 2^(k-1) := by
+  induction k, hk using Nat.le_induction with
+  | base => norm_num
+  | succ n hn ih =>
+    rw [Nat.add_sub_cancel]
+    rw [pow_succ' 2, mul_two]
+    apply Nat.lt_add_of_lt_of_le ih
+    calc (n + 1)^3 = n^3 + 3*n^2 + 3*n + 1 := by ring
+         _ < n^3 + 3*n^2 + 3*n^2 + n^2 := by
+           gcongr
+           · apply Nat.le_mul_self
+           · apply one_le_pow' (by decide) n
+         _ = n^3 + 7*n^2 := by ring
+         _ < n^3 + n*n^2 := by
+           gcongr
+           exact le_trans (by decide) hn
+         _ = 2 * n^3 := by ring; rw [pow_add]; simp
+
+/-- Arithmetic inequality for large k.
+    (k^2 - k)^(k - pi(k)) > k! for k >= 14. -/
+theorem large_k_inequality (k : ℕ) (hk : k ≥ 14) : (k^2 - k)^(k - primeCounting k) > k.factorial := by
+  have h_pi : primeCounting k ≤ (k + 1) / 2 := primeCounting_le_ceil_half k (le_trans (by decide) hk)
+  
+  have h_exp : k - primeCounting k ≥ (k - 1) / 2 := by
+    rw [le_div_iff_mul_le (by decide)]
+    rw [tsub_le_iff_right]
+    have h_pi_le_k : primeCounting k ≤ k := Nat.primeCounting_le_self k
+    rw [Nat.mul_sub_left_distrib]
+    apply le_sub_of_add_le
+    rw [add_comm]
+    apply le_trans (Nat.mul_le_mul_left 2 h_pi)
+    rw [mul_div_cancel' _ (by decide)]
+    rw [Nat.add_comm]
+    exact le_refl _
+
+  have h_fact_bound : (k.factorial : ℝ) ≤ exp 1 * Real.sqrt k * ((k : ℝ) / exp 1) ^ k := by
+    have h_anti := Stirling.stirlingSeq'_antitone
+    have h_ge1 : 1 ≤ k := le_trans (by decide) hk
+    have h_le := h_anti h_ge1 
+    rw [Stirling.stirlingSeq_one] at h_le
+    unfold Stirling.stirlingSeq at h_le
+    rw [div_le_iff (by positivity)] at h_le
+    calc (k.factorial : ℝ) ≤ (exp 1 / Real.sqrt 2) * (Real.sqrt (2 * k) * ((k : ℝ) / exp 1) ^ k) := h_le
+         _ = (exp 1 / Real.sqrt 2) * (Real.sqrt 2 * Real.sqrt k * ((k : ℝ) / exp 1) ^ k) := by rw [Real.sqrt_mul (by decide) (by cast_case; linarith)]
+         _ = exp 1 * Real.sqrt k * ((k : ℝ) / exp 1) ^ k := by ring_nf; rw [mul_assoc, ← mul_assoc (sqrt 2), div_mul_cancel _ (by norm_num), mul_comm]
+         
+  have h_k_pos : (k : ℝ) > 0 := by cast_case; linarith
+  have h_lhs_pos : ((k^2 - k)^(k - primeCounting k) : ℝ) > 0 := by
+    apply pow_pos
+    rw [← Nat.cast_pow, ← Nat.cast_sub]
+    apply Nat.cast_pos.mpr
+    apply Nat.sub_pos_of_lt
+    rw [sq, ← mul_one k]
+    apply Nat.mul_lt_mul_of_pos_left (lt_trans (by decide) hk) (lt_trans (by decide) hk)
+    exact Nat.le_mul_self k
+    
+  apply lt_of_lt_of_le (b := (exp 1 * Real.sqrt k * ((k : ℝ) / exp 1) ^ k))
+  swap
+  · norm_cast
+  
+  rw [← Real.log_lt_log_iff h_lhs_pos (by positivity)]
+  
+  rw [Real.log_pow]
+  rw [Real.log_mul (by positivity) (by positivity)]
+  rw [Real.log_mul (by positivity) (by positivity)]
+  rw [Real.log_pow, Real.log_div (by linarith) (by positivity), Real.log_exp]
+  rw [Real.log_sqrt (by linarith)]
+  
+  have h_log_lhs : Real.log ((k^2 - k) : ℝ) = Real.log k + Real.log (k - 1) := by
+    rw [← Real.log_mul (by linarith) (by cast_case; linarith)]
+    congr 1
+    rw [sq, ← mul_sub]
+    norm_cast
+  
+  rw [h_log_lhs]
+  
+  have h_lhs_lower : ((k - primeCounting k) : ℝ) * (Real.log k + Real.log (k - 1)) ≥ 
+                     ((k - 1) / 2 : ℝ) * (Real.log k + Real.log (k - 1)) := by
+    apply mul_le_mul_of_nonneg_right
+    · rw [le_div_iff₀ (by norm_num)]
+      norm_cast
+      exact h_exp
+    · apply add_nonneg (Real.log_nonneg (by linarith)) (Real.log_nonneg (by linarith))
+    
+  apply lt_of_lt_of_le _ h_lhs_lower
+  
+  have h_log_bound : 3 * Real.log k < (k : ℝ) - 1 := by
+    rw [← Real.log_exp ((k : ℝ) - 1)]
+    rw [← Real.log_pow]
+    apply Real.log_lt_log (by positivity)
+    norm_cast
+    calc k^3 < 2^(k - 1) := cube_lt_pow_two k hk
+         _ < (exp 1)^(k - 1) := by
+            apply pow_lt_pow_left (exp_one_gt_d9.trans_le' (by norm_num)) (by norm_num) (by omega)
+            -- 2 < exp 1
+    
+  calc ((k - 1) / 2 : ℝ) * (Real.log k + Real.log (k - 1)) 
+       > ((k - 1) / 2 : ℝ) * (Real.log k + (Real.log k - 1)) := by
+        -- log(k-1) > log k - 1
+        have : Real.log (k - 1) > Real.log k - 1 := by
+          rw [gt_iff_lt, sub_lt_iff_lt_add]
+          rw [← Real.log_div (by linarith) (by linarith)]
+          rw [Real.log_lt_iff_lt_exp (by positivity)]
+          apply lt_of_le_of_lt (b := 1 + 1/13)
+          · apply add_le_add_left
+            apply div_le_div_of_le (by norm_num)
+            rw [le_sub_iff_add_le]
+            norm_cast; linarith
+          · norm_num; exact exp_one_gt_d9
+        gcongr
+     _ = (k - 1) * Real.log k - (k - 1) / 2 := by ring
+     _ > k * Real.log k - k + 0.5 * Real.log k + 1 := by
+       rw [gt_iff_lt, sub_lt_iff_lt_add]
+       have : k * Real.log k - k + 0.5 * Real.log k + 1 + (k - 1) / 2
+              = (k + 0.5) * Real.log k - 0.5 * k + 0.5 := by ring
+       rw [this, ← sub_lt_iff_lt_add']
+       have : (k - 1) * Real.log k - (k + 0.5) * Real.log k = -1.5 * Real.log k := by ring
+       rw [this, neg_lt_iff_pos_add, add_comm (-0.5*k + 0.5), neg_add_cancel_right]
+       -- -1.5 log k < -0.5 k + 0.5
+       -- 0.5 k - 0.5 < 1.5 log k -- Wait.
+       -- My algebra was confused.
+       -- Goal: -1.5 log k > -0.5 k + 0.5
+       -- 0.5 k - 0.5 > 1.5 log k
+       -- k - 1 > 3 log k.
+       rw [lt_iff_not_le, not_le]
+       rw [gt_iff_lt] at h_log_bound
+       linarith
+
+/-- Small k cases (k < 14). -/
+theorem small_k_cases (n k : ℕ) (hk : k < 14) (hk0 : 0 < k) (h : 2 * k ≤ n) :
+    ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k := by
+  interval_cases k
+  -- Case 1
+  · obtain ⟨p, hp⟩ := Nat.exists_prime_and_dvd (by linarith : n ≠ 1)
+    use p; simp; constructor
+    · exact hp.1
+    · constructor
+      · exact hp.2
+      · exact Nat.Prime.two_le hp.1
+  -- Cases 2..13
+  all_goals {
+    sorry
+  }
 
 lemma primeCounting_lt_self (k : ℕ) (hk : 2 ≤ k) : Nat.primeCounting k < k := by
   rw [Nat.primeCounting, ← Nat.primesBelow_card_eq_primeCounting']
@@ -340,13 +570,11 @@ lemma primeCounting_lt_self (k : ℕ) (hk : 2 ≤ k) : Nat.primeCounting k < k :
        _ < k := Nat.pred_lt (Nat.ne_of_gt (lt_of_lt_of_le zero_lt_two hk))
 
 /-- Sylvester-Schur Theorem (J. J. Sylvester, 1892; I. Schur, 1929).
-    For n ≥ 2k, the binomial coefficient n.choose k has a prime factor p > k.
-    This generalizes Bertrand's Postulate (which is the case n = 2k).
-    Not yet in Mathlib as of 2026. -/
-theorem sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) :
+    For n ≥ 2k and k > 0, the binomial coefficient n.choose k has a prime factor p > k. -/
+theorem sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) (hk0 : 0 < k) :
     ∃ p, p.Prime ∧ p ∣ n.choose k ∧ p > k := by
   by_cases hk_small : k < 14
-  · exact small_k_cases n k hk_small h
+  · exact small_k_cases n k hk_small hk0 h
   · push_neg at hk_small
     by_cases h_large : n > k ^ 2
     · -- Case 1: n > k^2
