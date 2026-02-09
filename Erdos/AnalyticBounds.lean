@@ -24,11 +24,11 @@ axiom sum_primes_inv_le (x : ℝ) (hx : x ≥ 286) :
 axiom sum_primes_inv_ge (x : ℝ) (hx : x ≥ 286) :
   sum_prime_recip x ≥ Real.log (Real.log x) + MeisselMertens - 1 / (2 * (Real.log x)^2)
 
-/-- Bounds for pi(x) used in the proof for k >= 300. -/
-axiom pi_upper_bound_tight (n : ℕ) (hn : n ≥ 300) :
+/-- Bounds for pi(x) used in the proof for k >= 60184. -/
+axiom pi_upper_bound_tight (n : ℕ) (hn : n ≥ 60184) :
   (Nat.primeCounting n : ℝ) < (n : ℝ) / (Real.log n - 1.1)
 
-axiom pi_lower_bound_tight (n : ℕ) (hn : n ≥ 150) :
+axiom pi_lower_bound_tight (n : ℕ) (hn : n ≥ 5393) :
   (Nat.primeCounting n : ℝ) > (n : ℝ) / (Real.log n - 1)
 
 end Erdos1094

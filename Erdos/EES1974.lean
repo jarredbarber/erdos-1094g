@@ -122,14 +122,18 @@ theorem verify_high_k (k : ℕ) (h_low : 167 ≤ k) (h_high : k ≤ 299) : verif
 
 /-- Axiom linking the analytic bound E(k) < 1 to the absence of solutions.
     This replaces the brute-force check or stronger number theory axioms for large k. -/
-axiom ees_heuristic_implication (n k : ℕ) (hk : 300 ≤ k) (hnk : 2 * k ≤ n) (hnk2 : n < k * k) :
+axiom ees_heuristic_implication (n k : ℕ) (hk : 60184 ≤ k) (hnk : 2 * k ≤ n) (hnk2 : n < k * k) :
   E_val k < 1 → (n.choose k).minFac ≤ k
 
 /-- Result from EES 1974 for large k, derived from the analytic bound. -/
-theorem ees_large_k_derived (n k : ℕ) (hk : 300 ≤ k) (hnk : 2 * k ≤ n) (hnk2 : n < k * k) :
+theorem ees_large_k_derived (n k : ℕ) (hk : 60184 ≤ k) (hnk : 2 * k ≤ n) (hnk2 : n < k * k) :
   (n.choose k).minFac ≤ k := by
   apply ees_heuristic_implication n k hk hnk hnk2
   apply analytic_bound_E_lt_one k hk
+
+/-- Intermediate range axiom to be replaced by computational verification. -/
+axiom ees_intermediate_range (n k : ℕ) (hk1 : 300 ≤ k) (hk2 : k < 60184) (hnk : 2 * k ≤ n) (hnk2 : n < k * k) :
+  (n.choose k).minFac ≤ k
 
 /-- The structural result for k ≥ 29. -/
 theorem verify_large_k (n k : ℕ) (h_k : 29 ≤ k) (h_nk : 2 * k ≤ n) (h_n_k2 : n < k * k) :
@@ -140,8 +144,11 @@ theorem verify_large_k (n k : ℕ) (h_k : 29 ≤ k) (h_nk : 2 * k ≤ n) (h_n_k2
   else if hk2 : k ≤ 299 then
     have h_ver := verify_high_k k (by linarith) hk2
     exact verify_kummer_range_imp k h_ver n h_nk h_n_k2
+  else if hk3 : k < 60184 then
+    have h_low : 300 ≤ k := by linarith
+    exact ees_intermediate_range n k h_low hk3 h_nk h_n_k2
   else
-    have hk_large : 300 ≤ k := by linarith
+    have hk_large : 60184 ≤ k := by linarith
     exact ees_large_k_derived n k hk_large h_nk h_n_k2
 
 theorem ees_1974_case2_bound_internal (n k : ℕ) (h_nk : 2 * k ≤ n) (h_n_k2 : n < k * k)

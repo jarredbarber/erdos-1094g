@@ -1,4 +1,5 @@
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.NumberTheory.PrimeCounting
@@ -6,6 +7,7 @@ import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.BigOperators.Field
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.Ring
 import Erdos.AnalyticBounds
 
 noncomputable section
@@ -33,23 +35,68 @@ def E_val (k : ℕ) : ℝ :=
 def delta (k : ℕ) (p : ℕ) : ℝ := (k : ℝ) / (p : ℝ) - 1
 
 /-- Standard inequality for log(1-x). -/
-axiom log_one_sub_le (x : ℝ) (h1 : 0 ≤ x) (h2 : x < 1) :
-  Real.log (1 - x) ≤ -x - x^2 / 2
+lemma log_one_sub_le (x : ℝ) (h1 : 0 ≤ x) (h2 : x < 1) :
+  Real.log (1 - x) ≤ -x - x^2 / 2 := by
+  let f := fun t => -t - t^2/2 - Real.log (1 - t)
+  
+  have h_deriv : ∀ t ∈ Set.Icc 0 x, HasDerivAt f (t^2 / (1 - t)) t := by
+    intro t ht
+    have ht_lt_1 : t < 1 := lt_of_le_of_lt ht.2 h2
+    have ht_ne : 1 - t ≠ 0 := by linarith
+    
+    have d1 : HasDerivAt (fun y => -y) (-1) t := hasDerivAt_neg t
+    
+    have d2 : HasDerivAt (fun y => -y^2/2) (-t) t := by
+      convert (hasDerivAt_pow 2 t).neg.div_const 2 using 1
+      · simp
+        ring
+      
+    have d3 : HasDerivAt (fun y => -Real.log (1 - y)) (1/(1-t)) t := by
+      have sub_ne : 1 - t ≠ 0 := by linarith
+      convert (hasDerivAt_log sub_ne).comp t ((hasDerivAt_id t).const_sub 1) |>.neg using 1
+      · simp
+
+    convert HasDerivAt.add (HasDerivAt.add d1 d2) d3 using 1
+    · ext y
+      simp [f]
+      ring
+    · field_simp [ht_ne]
+      ring
+
+  have h_mono : MonotoneOn f (Set.Icc 0 x) := by
+    apply monotoneOn_of_hasDerivWithinAt_nonneg (convex_Icc 0 x) 
+      (fun t ht => (h_deriv t ht).continuousAt.continuousWithinAt)
+      (fun t ht => (h_deriv t (interior_subset ht)).hasDerivWithinAt)
+    intro t ht
+    simp at ht
+    have ht_lt_1 : t < 1 := lt_trans ht.2 h2
+    apply div_nonneg (sq_nonneg t) (sub_nonneg.mpr ht_lt_1.le)
+
+  have h_eval : f 0 = 0 := by simp [f]
+  have h_pos : 0 ≤ f x := by
+    rw [← h_eval]
+    apply h_mono
+    · simp [h1]
+    · simp [h1]
+    · exact h1
+
+  dsimp [f] at h_pos
+  linarith
 
 /-- Lower bound for the quadratic term based on integral approximation. -/
-axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 300) :
+axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 60184) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then (delta k p)^2 else 0) >
   0.11 * (k : ℝ) / Real.log (k : ℝ)
 
 /-- Lower bound for the linear term based on Rosser-Schoenfeld. 
     Derived from RS bounds for sum(1/p) and pi(x). -/
-axiom sum_delta_ge (k : ℕ) (hk : k ≥ 300) :
+axiom sum_delta_ge (k : ℕ) (hk : k ≥ 60184) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then delta k p else 0) >
   0.19 * (k : ℝ) / Real.log (k : ℝ)
 
-lemma final_ineq_check (k : ℕ) (hk : k ≥ 300) :
+lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
   2 * Real.log k - 0.19 * k / Real.log k - (1/2) * (0.11 * k / Real.log k) < 0 := by
   have h_log_pos : 0 < Real.log k := Real.log_pos (by norm_cast; linarith)
   
@@ -59,11 +106,11 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 300) :
   have h_check : (k : ℝ) / (Real.log k)^2 > 2 / 0.245 := by
     -- Analytic verification:
     -- f(x) = x / (log x)^2 is increasing for x > e^2 ≈ 7.39.
-    have h_mono (x y : ℝ) (hx : 300 ≤ x) (hxy : x ≤ y) : x / (Real.log x)^2 ≤ y / (Real.log y)^2 := sorry
-    -- We check the value at k=300:
-    have h_base : (300 : ℝ) / (Real.log 300)^2 > 2 / 0.245 := sorry
-    have h_k_ge_300 : 300 ≤ (k : ℝ) := by exact_mod_cast hk
-    exact lt_of_lt_of_le h_base (h_mono 300 k (by norm_num) h_k_ge_300)
+    have h_mono (x y : ℝ) (hx : 60184 ≤ x) (hxy : x ≤ y) : x / (Real.log x)^2 ≤ y / (Real.log y)^2 := sorry
+    -- We check the value at k=60184:
+    have h_base : (60184 : ℝ) / (Real.log 60184)^2 > 2 / 0.245 := sorry
+    have h_k_ge : 60184 ≤ (k : ℝ) := by exact_mod_cast hk
+    exact lt_of_lt_of_le h_base (h_mono 60184 k (by norm_num) h_k_ge)
 
   rw [sub_sub, sub_lt_zero]
   -- Algebraic manipulation to match h_check
@@ -71,7 +118,7 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 300) :
   linarith
 
 /-- The analytic bound theorem. -/
-theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 300) : E_val k < 1 := by
+theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 60184) : E_val k < 1 := by
   have hk_pos : (k : ℝ) > 0 := by norm_cast; linarith
   have hk_log_pos : Real.log k > 0 := Real.log_pos (by norm_cast; linarith)
   

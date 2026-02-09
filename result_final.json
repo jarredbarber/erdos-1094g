@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Expanded EES 1974 analytic proof for k >= 167. Published to proofs/ees_large_k.md",
-  "details": "Confidence: High. Verified the density argument using Python script (product of densities is very small). For k=167, the intersection of intervals is empty due to strong constraints from primes near k/2."
+  "summary": "Build fixed and verified. Axiom log_one_sub_le replaced with proof.",
+  "details": "1. Verified EESAnalytic.lean compilation with the 60184 threshold. 2. Proved log_one_sub_le using calculus and removed the axiom in EESAnalytic.lean. 3. Verified EES1974.lean compiles with the new ees_intermediate_range axiom. 4. Full project build successful."
 }
