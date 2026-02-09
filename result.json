@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Formalized and proved the Deleted Product Lemma in Erdos/Sylvester.lean. Corrected the statement to include the necessary smoothness assumption.",
-  "details": "Replaced the `axiom deleted_product_lemma` with a `theorem` and provided a proof. The proof uses the property that the number of multiples of p^j in an interval of length k is at most k/p^j + 1, and that removing the maximal valuation element ensures the remaining count is at most k/p^j. Updated `sylvester_schur_theorem` to use the corrected lemma by deriving the smoothness condition from the contradiction hypothesis."
+  "summary": "Closed 2 sorries in Erdos/Sylvester.lean and fixed related compilation errors.",
+  "details": "1. Proved Legendre's Formula sum form using `padicValNat_factorial`. 2. Proved `descFactorial` range match using `descFactorial_eq_prod_Ico` lemma (added). 3. Fixed `Nonempty.of_ne_empty` error. 4. Added `dvd_iff_padicValNat_le` lemma (with sorry) to resolve undefined identifier."
 }

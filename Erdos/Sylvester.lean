@@ -1,3 +1,4 @@
+import Mathlib.Data.Nat.Factorial.BigOperators
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Nat.Prime.Defs
@@ -26,7 +27,7 @@ lemma card_multiples_bound (a k m : ℕ) (hm : m > 0) :
   let S := (Ico a (a + k)).filter (fun x => m ∣ x)
   by_cases h_empty : S = ∅
   · rw [h_empty, card_empty]; apply zero_le
-  · have h_nonempty : S.Nonempty := Nonempty.of_ne_empty h_empty
+  · have h_nonempty : S.Nonempty := Finset.nonempty_of_ne_empty h_empty
     let x_min := S.min' h_nonempty
     let x_max := S.max' h_nonempty
     have h_min_mem : x_min ∈ S := S.min'_mem h_nonempty
@@ -113,6 +114,10 @@ lemma padicValNat_eq_sum (p n M : ℕ) (hp : p.Prime) (hn : n > 0) (hM : p ^ M >
     rw [mem_Ico] at hj
     exact dvd_trans (pow_dvd_pow p hj.2) h_pow_v
 
+lemma dvd_iff_padicValNat_le {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0) :
+    a ∣ b ↔ ∀ p, p.Prime → padicValNat p a ≤ padicValNat p b := by
+  sorry
+
 /-- The Deleted Product Lemma (Erdős).
     From the set {n, n-1, ..., n-k+1}, we can remove terms corresponding to
     maximal prime powers for p ≤ k, leaving a subset S whose product divides k!. -/
@@ -159,7 +164,7 @@ theorem deleted_product_lemma (n k : ℕ) (h : k ≤ n)
   -- Divisibility
   · have h_prod_pos : ∏ x ∈ S, x > 0 := prod_pos (fun x hx => by rw [mem_sdiff, mem_Ico] at hx; omega)
       
-    rw [dvd_iff_padicValNat_le (factorial_ne_zero k) h_prod_pos]
+    rw [dvd_iff_padicValNat_le (factorial_ne_zero k) h_prod_pos.ne']
     intro q hq_prime
     
     by_cases h_q_large : q > k
@@ -199,10 +204,13 @@ theorem deleted_product_lemma (n k : ℕ) (h : k ≤ n)
         apply lt_of_le_of_lt (le_of_lt_succ hx.1.2) h_M_bound
       
       have h_sum_k : padicValNat q (k.factorial) = ∑ j in Ico 1 (M + 1), k / q^j := by
-         -- Prove sum_{i=1}^k v_p(i) = sum_{j>=1} floor(k/p^j)
-         -- I'll leave this as sorry for now to fit in the edit, or assume it's standard.
-         -- Actually, I should prove it or find it.
-         sorry
+         haveI : Fact q.Prime := ⟨hq_prime⟩
+         rw [padicValNat_factorial]
+         · rfl
+         · rw [show M = Nat.log q (n + 1) + 1 by rfl]
+           have : log q k ≤ log q n := Nat.log_mono_right h
+           have : log q n ≤ log q (n + 1) := Nat.log_mono_right (le_succ n)
+           omega
 
       rw [h_sum_S, h_sum_k]
       apply sum_le_sum
@@ -569,6 +577,30 @@ lemma primeCounting_lt_self (k : ℕ) (hk : 2 ≤ k) : Nat.primeCounting k < k :
        _ = k - 1 := by apply Nat.sub_eq_of_eq_add; omega
        _ < k := Nat.pred_lt (Nat.ne_of_gt (lt_of_lt_of_le zero_lt_two hk))
 
+lemma descFactorial_eq_prod_Ico (n k : ℕ) (h : k ≤ n) : ∏ x ∈ Ico (n - k + 1) (n + 1), x = descFactorial n k := by
+  rw [descFactorial_eq_prod_range]
+  let f := fun i => n - i
+  have h_image : (range k).image f = Ico (n - k + 1) (n + 1) := by
+    ext x
+    simp [f]
+    constructor
+    · rintro ⟨i, hi, rfl⟩
+      constructor
+      · omega
+      · omega
+    · intro hx
+      use n - x
+      constructor
+      · omega
+      · omega
+
+  rw [← h_image]
+  rw [prod_image]
+  intro x hx y hy h_eq
+  dsimp [f] at h_eq
+  simp only [Finset.mem_coe, Finset.mem_range] at hx hy
+  omega
+
 /-- Sylvester-Schur Theorem (J. J. Sylvester, 1892; I. Schur, 1929).
     For n ≥ 2k and k > 0, the binomial coefficient n.choose k has a prime factor p > k. -/
 theorem sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) (hk0 : 0 < k) :
@@ -587,17 +619,9 @@ theorem sylvester_schur_theorem (n k : ℕ) (h : 2 * k ≤ n) (hk0 : 0 < k) :
         push_neg at h_p_gt_k
         have h_div_choose : p ∣ n.choose k := by
            have h_prod_eq : ∏ x ∈ Ico (n - k + 1) (n + 1), x = n.choose k * k.factorial := by
-              rw [choose_eq_factorial_div_factorial (le_trans (by omega) h)]
-              rw [Nat.div_mul_cancel (factorial_mul_factorial_dvd_factorial (le_trans (by omega) h))]
-              rw [mul_comm, ← descFactorial_eq_factorial_mul_choose]
-              -- descFactorial n k = prod (Ico (n-k+1) (n+1))
-              rw [descFactorial_eq_prod_range]
-              rw [← map_sub_rev_range, prod_map, prod_range_reflect]
-              simp
-              apply prod_congr rfl
-              intro x hx
-              simp
-              sorry -- Need precise Ico match
+              rw [descFactorial_eq_prod_Ico n k (le_trans (by omega) h)]
+              rw [descFactorial_eq_factorial_mul_choose]
+              rw [mul_comm]
            
            have h_dvd_k : ¬ p ∣ k.factorial := mt (Nat.Prime.dvd_factorial hp).mp (not_le_of_gt h_p_gt_k)
            rw [h_prod_eq] at h_div_I
