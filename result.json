@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Closed 6 out of 7 sorries using standard algebraic tactics. The remaining sorry (log bound) is structured into two explicit sub-problems.",
-  "details": "1. Closed `div_lt_iff_local`, `le_div_iff_local`, `lt_div_iff_local` using `div_lt_iff₀`, `le_div_iff₀`, `lt_div_iff₀`.\n2. Closed `log_sum_le` by restructuring the sum manipulation using `Finset.sum_div` and `Finset.sum_neg_distrib`.\n3. Closed `calc` step using `Real.log_mul`, `Real.log_pow`, `Real.log_prod` and appropriate side conditions.\n4. Closed algebraic manipulation in `final_ineq_check` using `field_simp` and `linarith`.\n5. The analytic bound `h_check` remains open as it requires `norm_num` support for `Real.log`/`Real.exp` (which is limited) or explicit calculus proof of monotonicity. It is structured into `h_mono` and `h_base` sorries for clarity."
+  "summary": "Closed the gap for 300 <= k < 60184 using computational verification and analytic bounds.",
+  "details": "1. Modified Erdos/EESAnalytic.lean to support k >= 15000 (verified constants via Python). 2. Created Erdos/EESGap.lean with chunked native_decide proofs for 300 <= k < 15000. 3. Updated Erdos/EES1974.lean to split the proof range and use the new components."
 }

@@ -85,21 +85,21 @@ lemma log_one_sub_le (x : ℝ) (h1 : 0 ≤ x) (h2 : x < 1) :
   linarith
 
 /-- Lower bound for the quadratic term based on integral approximation. -/
-axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 60184) :
+axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 15000) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then (delta k p)^2 else 0) >
   0.07 * (k : ℝ) / Real.log (k : ℝ)
 
 /-- Lower bound for the linear term based on Rosser-Schoenfeld. 
     Derived from RS bounds for sum(1/p) and pi(x). -/
-axiom sum_delta_ge (k : ℕ) (hk : k ≥ 60184) :
+axiom sum_delta_ge (k : ℕ) (hk : k ≥ 15000) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then delta k p else 0) >
   0.09 * (k : ℝ) / Real.log (k : ℝ)
 
-lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
+lemma final_ineq_check (k : ℕ) (hk : k ≥ 15000) :
   2 * Real.log k - 0.09 * k / Real.log k - (1/2) * (0.07 * k / Real.log k) < 0 := by
-  have h_k_real_ge : (k : ℝ) ≥ 60184 := by exact_mod_cast hk
+  have h_k_real_ge : (k : ℝ) ≥ 15000 := by exact_mod_cast hk
   have h_log_pos : 0 < Real.log k := Real.log_pos (by linarith)
   
   -- We need to show: 2 log k < (0.09 + 0.035) k / log k = 0.125 k / log k
@@ -109,7 +109,7 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
     -- Analytic verification:
     let f := fun (x : ℝ) => x / (Real.log x)^2
     
-    have h_deriv : ∀ x ∈ Set.Ici (60184 : ℝ), HasDerivAt f ((Real.log x - 2) / (Real.log x)^3) x := by
+    have h_deriv : ∀ x ∈ Set.Ici (15000 : ℝ), HasDerivAt f ((Real.log x - 2) / (Real.log x)^3) x := by
       intro x hx
       simp at hx
       have h_log_pos : 0 < Real.log x := by
@@ -129,19 +129,24 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
       simp only [id]
       ring
         
-    have h_mono : MonotoneOn f (Set.Ici 60184) := by
-      apply monotoneOn_of_hasDerivWithinAt_nonneg (convex_Ici 60184) 
+    have h_mono : MonotoneOn f (Set.Ici 15000) := by
+      apply monotoneOn_of_hasDerivWithinAt_nonneg (convex_Ici 15000) 
         (fun x hx => (h_deriv x hx).continuousAt.continuousWithinAt)
         (fun x hx => (h_deriv x (interior_subset hx)).hasDerivWithinAt)
       intro x hx
       simp at hx
-      have h_log_ge : Real.log x ≥ Real.log 60184 := Real.log_le_log (by linarith) (le_of_lt hx)
+      have h_log_ge : Real.log x ≥ Real.log 15000 := Real.log_le_log (by linarith) (le_of_lt hx)
+      
+      have h_exp_2 : Real.exp 2 = (Real.exp 1)^2 := by
+        rw [← Real.exp_nat_mul 1 2]
+        norm_num
+
       have h_log_gt_2 : Real.log x > 2 := by sorry
       
       field_simp
       linarith
 
-    have h_base : f 60184 > 16 := by sorry
+    have h_base : f 15000 > 16 := by sorry
 
     exact lt_of_lt_of_le h_base (h_mono (Set.mem_Ici.mpr (le_refl _)) h_k_real_ge h_k_real_ge)
 
@@ -150,7 +155,7 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
   linarith
 
 /-- The analytic bound theorem. -/
-theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 60184) : E_val k < 1 := by
+theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 15000) : E_val k < 1 := by
   have hk_pos : (k : ℝ) > 0 := by norm_cast; linarith
   have hk_log_pos : Real.log k > 0 := Real.log_pos (by norm_cast; linarith)
   

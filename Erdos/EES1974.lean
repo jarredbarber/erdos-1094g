@@ -7,6 +7,7 @@ import Mathlib.Data.List.Range
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Erdos.CheckFact
 import Erdos.EESAnalytic
+import Erdos.EESGap
 
 namespace Erdos1094
 
@@ -126,11 +127,15 @@ theorem verify_high_k (k : ℕ) (h_low : 167 ≤ k) (h_high : k ≤ 299) : verif
 axiom ees_sieve_bound (n k : ℕ) (hk : 300 ≤ k) (hnk : 2 * k ≤ n) (hnk2 : n < k * k) :
   E_val k < 1 → (n.choose k).minFac ≤ k
 
-/-- Result from EES 1974 for large k, derived from the analytic bound. -/
 theorem ees_large_k_derived (n k : ℕ) (hk : 300 ≤ k) (hnk : 2 * k ≤ n) (hnk2 : n < k * k) :
   (n.choose k).minFac ≤ k := by
   apply ees_sieve_bound n k hk hnk hnk2
-  apply analytic_bound_E_lt_one k hk
+  if h : k < 15000 then
+    have h_check := verify_gap_all k hk h
+    exact check_E_val_correct k h_check
+  else
+    have h_ge : k ≥ 15000 := by linarith
+    exact analytic_bound_E_lt_one k h_ge
 
 /-- The structural result for k ≥ 29. -/
 theorem verify_large_k (n k : ℕ) (h_k : 29 ≤ k) (h_nk : 2 * k ≤ n) (h_n_k2 : n < k * k) :
