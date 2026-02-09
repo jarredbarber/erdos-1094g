@@ -59,7 +59,7 @@ lemma verify_range_correct (k : ℕ) (h : verify_range k = true) :
     intro n h1 h2
     have h_le : k * k ≤ k.factorial + k := le_of_not_gt h_start_gt
     apply check_range_impl_correct k (k * k) (k.factorial + k - k * k + 1) h n h1
-    rw [Nat.add_assoc, Nat.add_sub_cancel' h_le]
+    rw [← Nat.add_assoc, Nat.add_sub_cancel' h_le]
     linarith
 
 lemma check_k4 (n : ℕ) (h_range : 16 ≤ n ∧ n ≤ 28) : 
