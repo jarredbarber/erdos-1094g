@@ -11,12 +11,13 @@ namespace Erdos1094
 # Erdős Problem 1094
 
 The least prime factor of the binomial coefficient `n.choose k` is denoted by `g(n, k)`.
-The conjecture (proven by Ecklund in 1969) states that for `n ≥ 2k`, `g(n, k) ≤ max (n/k) k`
-with a finite number of exceptions.
+The conjecture (Erdős-Lacampagne-Selfridge, 1988) states that for `n ≥ 2k`,
+`g(n, k) ≤ max (n/k) k` with only finitely many exceptions.
 
-Reference:
-E. F. Ecklund Jr., "On the prime factorization of binomial coefficients",
-Pacific Journal of Mathematics, 29(2), 267-270 (1969).
+This is listed as an open problem at https://www.erdosproblems.com/1094
+
+The proof strategy decomposes into cases using results of Ecklund (1969),
+Erdős-Ecklund-Selfridge (1974), and the Sylvester-Schur theorem (1892).
 -/
 
 /-- The least prime factor of `n.choose k`. -/
