@@ -2,6 +2,7 @@ import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.Factorial.Basic
+import Mathlib.Data.Nat.Prime.Factorial
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Algebra.BigOperators.Associated
@@ -54,7 +55,7 @@ lemma roughPart_gt_B (n B : ℕ) (h : roughPart n B > 1) : roughPart n B > B := 
       exact Nat.Prime.not_dvd_one hp hq_dvd
   exact lt_of_lt_of_le p_gt_B (le_of_dvd (by linarith) hp_dvd)
 
-lemma smoothPart_pos (n B : ℕ) (hn : n ≠ 0) : smoothPart n B > 0 := by
+lemma smoothPart_pos (n B : ℕ) : smoothPart n B > 0 := by
   rw [smoothPart, Finsupp.prod]
   apply Finset.prod_pos
   intro p hp
@@ -65,7 +66,14 @@ lemma smoothPart_pos (n B : ℕ) (hn : n ≠ 0) : smoothPart n B > 0 := by
 
 lemma smoothPart_mul (a b B : ℕ) (ha : a ≠ 0) (hb : b ≠ 0) : 
     smoothPart (a * b) B = smoothPart a B * smoothPart b B := by
-  sorry -- Admitting smoothPart_mul due to Finsupp.prod_add_index complexity
+  rw [smoothPart, smoothPart, smoothPart]
+  rw [Nat.factorization_mul ha hb]
+  rw [Finsupp.prod_add_index]
+  · simp
+  · intro p k1 k2
+    by_cases h : p ≤ B
+    · simp [h, pow_add]
+    · simp [h]
 
 lemma smoothPart_eq_self_of_le (n B : ℕ) (hn : n ≠ 0) (h : ∀ p, p.Prime → p ∣ n → p ≤ B) : smoothPart n B = n := by
   rw [smoothPart]
@@ -147,7 +155,7 @@ lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * 
     have h_fact_smooth : smoothPart k.factorial (n / k) = k.factorial := by
       apply smoothPart_eq_self_of_le _ _ (Nat.factorial_ne_zero k)
       intro p hp h_dvd
-      sorry -- Nat.prime_dvd_factorial_iff issues
+      exact le_trans (hp.dvd_factorial.mp h_dvd) ((Nat.le_div_iff_mul_le h_k_pos).mpr h_n_sq)
 
     have h_choose_smooth : smoothPart (n.choose k) (n / k) = 1 := by
       rw [smoothPart, Finsupp.prod]
@@ -155,7 +163,11 @@ lemma prod_smooth_eq_factorial (n k : ℕ) (h_nk : n ≥ k) (h_n_sq : n ≥ k * 
       intro p hp
       split_ifs with h_le
       · exfalso
-        sorry -- Nat.mem_primeFactors issues
+        have h_prime : p.Prime := Nat.prime_of_mem_primeFactors hp
+        have h_dvd : p ∣ n.choose k := Nat.dvd_of_mem_primeFactors hp
+        have h_ge_minFac : p ≥ (n.choose k).minFac := Nat.minFac_le_of_dvd h_prime.two_le h_dvd
+        have h_gt : p > n / k := lt_of_lt_of_le h_g h_ge_minFac
+        linarith
       · rfl
 
     rw [h_fact_smooth, h_choose_smooth, mul_one]
@@ -179,7 +191,7 @@ lemma smoothPart_ge_k (n B k : ℕ) (h_dvd : k ∣ n) (h_kB : k ≤ B) (hn : n �
     intro p hp hpk
     exact le_trans (Nat.le_of_dvd (Nat.pos_of_ne_zero h_k_ne_0) hpk) h_kB
   rw [h_smooth_k]
-  have h_smooth_q_pos : smoothPart q B ≥ 1 := smoothPart_pos q B h_q_ne_0
+  have h_smooth_q_pos : smoothPart q B ≥ 1 := smoothPart_pos q B
   exact Nat.le_mul_of_pos_right k h_smooth_q_pos
 
 lemma smoothPart_lt_k (n k i : ℕ) (h_nk : n ≥ k * k) (h_k : k > 0) 
