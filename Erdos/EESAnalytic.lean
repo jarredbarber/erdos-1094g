@@ -3,6 +3,7 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.NumberTheory.PrimeCounting
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.BigOperators.Field
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.FieldSimp
 import Erdos.AnalyticBounds
@@ -14,11 +15,14 @@ namespace Erdos1094
 open Real Nat BigOperators
 
 /-- Local helper for division inequality. -/
-lemma div_lt_iff_local {a b c : ℝ} (hc : 0 < c) : a / c < b ↔ a < b * c := by sorry
+lemma div_lt_iff_local {a b c : ℝ} (hc : 0 < c) : a / c < b ↔ a < b * c := by
+  rw [div_lt_iff₀ hc]
 
-lemma le_div_iff_local {a b c : ℝ} (hc : 0 < c) : a ≤ b / c ↔ a * c ≤ b := by sorry
+lemma le_div_iff_local {a b c : ℝ} (hc : 0 < c) : a ≤ b / c ↔ a * c ≤ b := by
+  rw [le_div_iff₀ hc]
 
-lemma lt_div_iff_local {a b c : ℝ} (hc : 0 < c) : a < b / c ↔ a * c < b := by sorry
+lemma lt_div_iff_local {a b c : ℝ} (hc : 0 < c) : a < b / c ↔ a * c < b := by
+  rw [lt_div_iff₀ hc]
 
 /-- The "expected number of solutions" E(k). -/
 def E_val (k : ℕ) : ℝ :=
@@ -55,15 +59,16 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 300) :
   have h_check : (k : ℝ) / (Real.log k)^2 > 2 / 0.245 := by
     -- Analytic verification:
     -- f(x) = x / (log x)^2 is increasing for x > e^2 ≈ 7.39.
+    have h_mono (x y : ℝ) (hx : 300 ≤ x) (hxy : x ≤ y) : x / (Real.log x)^2 ≤ y / (Real.log y)^2 := sorry
     -- We check the value at k=300:
-    -- 300 / (log 300)^2 ≈ 300 / (5.703)^2 ≈ 300 / 32.53 ≈ 9.22
-    -- 9.22 > 8.163 is true.
-    -- Since k >= 300 and f is increasing, the inequality holds for all k >= 300.
-    sorry
+    have h_base : (300 : ℝ) / (Real.log 300)^2 > 2 / 0.245 := sorry
+    have h_k_ge_300 : 300 ≤ (k : ℝ) := by exact_mod_cast hk
+    exact lt_of_lt_of_le h_base (h_mono 300 k (by norm_num) h_k_ge_300)
 
   rw [sub_sub, sub_lt_zero]
   -- Algebraic manipulation to match h_check
-  sorry
+  field_simp [h_log_pos] at *
+  linarith
 
 /-- The analytic bound theorem. -/
 theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 300) : E_val k < 1 := by
@@ -75,10 +80,10 @@ theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 300) : E_val k < 1 := by
     apply mul_pos (pow_pos hk_pos 2)
     apply Finset.prod_pos; intro p hp
     split_ifs with h_cond
-    . have Hp : (p : ℝ) > 0 := by norm_cast; exact cast_pos.mpr (Prime.pos (Finset.mem_filter.mp hp).2)
+    · have Hp : (p : ℝ) > 0 := by norm_cast; exact cast_pos.mpr (Prime.pos (Finset.mem_filter.mp hp).2)
       have H : (k : ℝ) / p < 2 := (div_lt_iff_local Hp).mpr (by linarith)
       linarith
-    . exact zero_lt_one
+    · exact zero_lt_one
   )]
   
   -- Decomposition
@@ -86,18 +91,65 @@ theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 300) : E_val k < 1 := by
                  if (p : ℝ) > (k : ℝ) / 2 then delta k p else 0
   let S_quad := ∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
                   if (p : ℝ) > (k : ℝ) / 2 then (delta k p)^2 else 0
-
   -- Bounding log(1 - delta)
   have log_sum_le : (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
       if (p : ℝ) > (k : ℝ) / 2 then Real.log (1 - delta k p) else 0) ≤
       -S_lin - S_quad / 2 := by
-    -- We assume the expansion holds
-    sorry
-
+    dsimp [S_lin, S_quad]
+    rw [Finset.sum_div, sub_eq_add_neg, ← Finset.sum_neg_distrib, ← Finset.sum_neg_distrib, ← Finset.sum_add_distrib]
+    apply Finset.sum_le_sum
+    intro p hp
+    split_ifs with h_cond
+    · have hp_pos : (p : ℝ) > 0 := by norm_cast; exact cast_pos.mpr (Prime.pos (Finset.mem_filter.mp hp).2)
+      have h_delta_lt_one : delta k p < 1 := by
+        dsimp [delta]
+        apply (sub_lt_iff_lt_add).mpr
+        rw [div_lt_iff_local hp_pos]
+        linarith
+      have h_delta_nonneg : 0 ≤ delta k p := by
+        dsimp [delta]
+        apply sub_nonneg.mpr
+        rw [le_div_iff_local hp_pos, one_mul]
+        norm_cast
+        apply le_of_lt_succ (Finset.mem_range.mp (Finset.mem_filter.mp hp).1)
+      have := log_one_sub_le (delta k p) h_delta_nonneg h_delta_lt_one
+      linarith
+    · simp
   calc
-    Real.log (E_val k) = 2 * Real.log k + ∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
+    Real.log (E_val k) = Real.log ((k : ℝ)^2 * ∏ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
+        if (p : ℝ) > (k : ℝ) / 2 then (2 - (k : ℝ) / p) else 1) := rfl
+    _ = Real.log ((k : ℝ)^2) + Real.log (∏ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
+        if (p : ℝ) > (k : ℝ) / 2 then (2 - (k : ℝ) / p) else 1) := by
+      refine Real.log_mul ?_ ?_
+      · apply pow_ne_zero; linarith
+      · apply Finset.prod_ne_zero_iff.mpr
+        intro p hp
+        split_ifs with h
+        · apply _root_.ne_of_gt
+          have hp_pos : (p : ℝ) > 0 := by norm_cast; exact cast_pos.mpr (Prime.pos (Finset.mem_filter.mp hp).2)
+          have : (k : ℝ) / p < 2 := (div_lt_iff_local hp_pos).mpr (by linarith)
+          linarith
+        · exact one_ne_zero
+    _ = 2 * Real.log k + ∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
+        Real.log (if (p : ℝ) > (k : ℝ) / 2 then (2 - (k : ℝ) / p) else 1) := by
+      rw [Real.log_pow]
+      rw [Real.log_prod]
+      · congr
+      · intros p hp
+        split_ifs with h
+        · have hp_pos : (p : ℝ) > 0 := by norm_cast; exact cast_pos.mpr (Prime.pos (Finset.mem_filter.mp hp).2)
+          have : (k : ℝ) / p < 2 := (div_lt_iff_local hp_pos).mpr (by linarith)
+          linarith
+        · exact one_ne_zero
+    _ = 2 * Real.log k + ∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
         if (p : ℝ) > (k : ℝ) / 2 then Real.log (1 - delta k p) else 0 := by
-      exact sorry -- Expansion of log E
+      congr 1
+      apply Finset.sum_congr rfl
+      intro p hp
+      split_ifs with h
+      · rw [delta]
+        ring_nf
+      · rw [Real.log_one]
     _ ≤ 2 * Real.log k - S_lin - S_quad / 2 := by
       linarith [log_sum_le]
     _ < 0 := by

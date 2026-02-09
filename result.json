@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Implemented computational check for EES k=167..299 in CheckFact.lean and updated EES1974.lean.",
-  "details": "1. Moved Kummer checking logic and `verify_kummer_range` from EES1974.lean to CheckFact.lean. 2. Implemented `verify_ees_167_199`, `verify_ees_200_249`, `verify_ees_250_299` in CheckFact.lean using `native_decide` (split into chunks to avoid potential timeout/memory issues). 3. Updated EES1974.lean to use these verification theorems. 4. Updated the axiom `ees_large_k` to require `k >= 300`."
+  "summary": "Closed 6 out of 7 sorries using standard algebraic tactics. The remaining sorry (log bound) is structured into two explicit sub-problems.",
+  "details": "1. Closed `div_lt_iff_local`, `le_div_iff_local`, `lt_div_iff_local` using `div_lt_iff₀`, `le_div_iff₀`, `lt_div_iff₀`.\n2. Closed `log_sum_le` by restructuring the sum manipulation using `Finset.sum_div` and `Finset.sum_neg_distrib`.\n3. Closed `calc` step using `Real.log_mul`, `Real.log_pow`, `Real.log_prod` and appropriate side conditions.\n4. Closed algebraic manipulation in `final_ineq_check` using `field_simp` and `linarith`.\n5. The analytic bound `h_check` remains open as it requires `norm_num` support for `Real.log`/`Real.exp` (which is limited) or explicit calculus proof of monotonicity. It is structured into `h_mono` and `h_base` sorries for clarity."
 }
