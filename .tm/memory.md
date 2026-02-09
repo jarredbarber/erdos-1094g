@@ -1,23 +1,22 @@
-## Heartbeat — 2026-02-09 00:16 UTC
+## Heartbeat — 2026-02-09 01:52 UTC
 
 **Metrics**: 
-- Sorry count: 7 (DeletedProduct: 1, Ecklund: 6)
+- Sorry count: 4 (Ecklund: 1, Sylvester: 3)
 - Verified proofs: 7
-- Task count: 4 open, 1 in_progress, 41 closed
+- Task count: 4 open, 1 in_progress, 46 closed
 
-**Status**: Phase 3: Finalizing Proofs. EcklundCase1 complete. Handling Ecklund checks and Sylvester axioms.
+**Status**: Deep in the weeds of Ecklund/Sylvester formalization.
 
 **Observations**:
-- `Erdos/EcklundCase1.lean` is sorry-free (task `6yx` succeeded).
-- `Erdos/Ecklund.lean` has 6 checks left (k=3,4,5,6 and k>=7 contradiction).
-- `Erdos/DeletedProduct.lean` has 1 sorry (being worked on by `ir0`).
-- `Erdos/Sylvester.lean` is sorry-free but uses 3 axioms (`deleted_product`, `large_k_inequality`, `small_k_cases`). `prime_gap_lemma` is kept as axiom.
+- `erdos1094g-zvo` (Ecklund) has successfully closed finite checks for $k=3..7$ using `CheckFact.lean`! Only $k \ge 8$ remains (infinite case).
+- `Erdos/Sylvester.lean` has 3 technical sorries (lines 198, 200, 372).
+- Explore tasks (`8st`, `oqb`) are open to replace major axioms (`prime_gap_lemma`, `ees_large_k`).
+- `4n7` is open to prove Sylvester axioms (`large_k_inequality`, `small_k_cases`).
 
 **Actions**:
-- Updated `zvo` with precise instructions for proving `h_n_upper` using `prod_smooth_eq_factorial` and handling finite checks.
-- Verified `EcklundCase1` completion.
+- Monitored `zvo`. It's tackling the general $k \ge 8$ case or deciding to axiomize it.
+- No new interventions needed. System is busy.
 
 **Watch next**:
-- Completion of `ir0` (Deleted Product).
-- Progress on `zvo` (Ecklund checks).
-- Progress on `4n7` (Sylvester axioms).
+- `zvo` completion.
+- Progress on Sylvester cleanups (`5ta`) and axioms (`4n7`).
