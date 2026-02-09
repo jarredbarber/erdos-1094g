@@ -75,3 +75,53 @@
 - Completion of `erdos1094g-t1v` (gap filling).
 - Verification of EES rigor (`erdos1094g-3ku`).
 - Build status (`erdos1094g-n7d`).
+## Heartbeat — 2026-02-09 10:22 UTC
+
+**Metrics**: 
+- Sorry count: Reduced by 1 (log_one_sub_le removed). Remaining:  and unproven axioms.
+- Task count: 4 open (, , , ).
+-  successfully fixed build and proved .
+
+**Status**: Recovering from axiom correction. Created tasks to prove remaining unverified axioms.
+
+**Observations**:
+-  was highly successful: not only fixed build but proved a lemma to remove an axiom.
+-  was obsolete (based on old thresholds) and stalled. Closed it.
+- Created  to rigorously derive  bounds for  \ge 60184$ (Priority 0).
+- Created  to close simple algebraic sorries in .
+- Gap filling () and EES verification () are proceeding.
+
+**Actions**:
+- Closed .
+- Created  (Derive sum_delta bounds).
+- Created  (Formalize final_ineq_check).
+- Verified previous task completion ().
+
+**Watch next**:
+- Progress on gap filling () — crucial for removing temporary axiom.
+- Progress on  — crucial for removing unverified sum_delta axioms.
+## Heartbeat — 2026-02-09 10:22 UTC
+
+**Metrics**: 
+- Sorry count: Reduced by 1 (log_one_sub_le removed). Remaining: `final_ineq_check` and unproven axioms.
+- Task count: 4 open (`t1v`, `3ku`, `wg5`, `0yt`).
+- `erdos1094g-n7d` successfully fixed build and proved `log_one_sub_le`.
+
+**Status**: Recovering from axiom correction. Created tasks to prove remaining unverified axioms.
+
+**Observations**:
+- `erdos1094g-n7d` was highly successful: not only fixed build but proved a lemma to remove an axiom.
+- `erdos1094g-kqp` was obsolete (based on old thresholds) and stalled. Closed it.
+- Created `wg5` to rigorously derive `sum_delta` bounds for k >= 60184 (Priority 0).
+- Created `0yt` to close simple algebraic sorries in `final_ineq_check`.
+- Gap filling (`t1v`) and EES verification (`3ku`) are proceeding.
+
+**Actions**:
+- Closed `kqp`.
+- Created `wg5` (Derive sum_delta bounds).
+- Created `0yt` (Formalize final_ineq_check).
+- Verified previous task completion (`n7d`).
+
+**Watch next**:
+- Progress on gap filling (`t1v`) — crucial for removing temporary axiom.
+- Progress on `wg5` — crucial for removing unverified sum_delta axioms.

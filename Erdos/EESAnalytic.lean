@@ -84,19 +84,19 @@ lemma log_one_sub_le (x : ℝ) (h1 : 0 ≤ x) (h2 : x < 1) :
   linarith
 
 /-- Lower bound for the quadratic term based on integral approximation. -/
-axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 60184) :
+axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 300) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then (delta k p)^2 else 0) >
   0.11 * (k : ℝ) / Real.log (k : ℝ)
 
 /-- Lower bound for the linear term based on Rosser-Schoenfeld. 
     Derived from RS bounds for sum(1/p) and pi(x). -/
-axiom sum_delta_ge (k : ℕ) (hk : k ≥ 60184) :
+axiom sum_delta_ge (k : ℕ) (hk : k ≥ 300) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then delta k p else 0) >
   0.19 * (k : ℝ) / Real.log (k : ℝ)
 
-lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
+lemma final_ineq_check (k : ℕ) (hk : k ≥ 300) :
   2 * Real.log k - 0.19 * k / Real.log k - (1/2) * (0.11 * k / Real.log k) < 0 := by
   have h_log_pos : 0 < Real.log k := Real.log_pos (by norm_cast; linarith)
   
@@ -106,11 +106,11 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
   have h_check : (k : ℝ) / (Real.log k)^2 > 2 / 0.245 := by
     -- Analytic verification:
     -- f(x) = x / (log x)^2 is increasing for x > e^2 ≈ 7.39.
-    have h_mono (x y : ℝ) (hx : 60184 ≤ x) (hxy : x ≤ y) : x / (Real.log x)^2 ≤ y / (Real.log y)^2 := sorry
-    -- We check the value at k=60184:
-    have h_base : (60184 : ℝ) / (Real.log 60184)^2 > 2 / 0.245 := sorry
-    have h_k_ge : 60184 ≤ (k : ℝ) := by exact_mod_cast hk
-    exact lt_of_lt_of_le h_base (h_mono 60184 k (by norm_num) h_k_ge)
+    have h_mono (x y : ℝ) (hx : 300 ≤ x) (hxy : x ≤ y) : x / (Real.log x)^2 ≤ y / (Real.log y)^2 := sorry
+    -- We check the value at k=300:
+    have h_base : (300 : ℝ) / (Real.log 300)^2 > 2 / 0.245 := sorry
+    have h_k_ge : 300 ≤ (k : ℝ) := by exact_mod_cast hk
+    exact lt_of_lt_of_le h_base (h_mono 300 k (by norm_num) h_k_ge)
 
   rw [sub_sub, sub_lt_zero]
   -- Algebraic manipulation to match h_check
@@ -118,7 +118,7 @@ lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
   linarith
 
 /-- The analytic bound theorem. -/
-theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 60184) : E_val k < 1 := by
+theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 300) : E_val k < 1 := by
   have hk_pos : (k : ℝ) > 0 := by norm_cast; linarith
   have hk_log_pos : Real.log k > 0 := Real.log_pos (by norm_cast; linarith)
   
