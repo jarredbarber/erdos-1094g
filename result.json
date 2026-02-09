@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Expanded EES 1974 analytic proof for k >= 167. Published to proofs/ees_large_k.md",
-  "details": "Confidence: High. Verified the density argument using Python script (product of densities is very small). For k=167, the intersection of intervals is empty due to strong constraints from primes near k/2."
+  "summary": "Implemented computational check for EES k=167..299 in CheckFact.lean and updated EES1974.lean.",
+  "details": "1. Moved Kummer checking logic and `verify_kummer_range` from EES1974.lean to CheckFact.lean. 2. Implemented `verify_ees_167_199`, `verify_ees_200_249`, `verify_ees_250_299` in CheckFact.lean using `native_decide` (split into chunks to avoid potential timeout/memory issues). 3. Updated EES1974.lean to use these verification theorems. 4. Updated the axiom `ees_large_k` to require `k >= 300`."
 }
