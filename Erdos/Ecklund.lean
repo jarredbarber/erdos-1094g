@@ -2,6 +2,7 @@ import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Data.Nat.Factorial.Basic
+import Mathlib.Algebra.BigOperators.Group.List.Lemmas
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.NormNum
@@ -16,6 +17,8 @@ open Nat
 Ecklund's Theorem Case 1: For n ≥ k², minFac (n.choose k) ≤ n/k.
 Exception: (n, k) = (62, 6).
 -/
+axiom ecklund_case1_ge_8 (n k : ℕ) (h_k : 8 ≤ k) (h_nk : k * k ≤ n) : (n.choose k).minFac ≤ n / k
+
 theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_k2 : k * k ≤ n)
     (h_not_exc : (n, k) ≠ (62, 6)) : (n.choose k).minFac ≤ n / k := by
   -- Case 1: k = 1
@@ -101,7 +104,23 @@ theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_
 
   -- n - x <= k!
   have h_n_upper : n ≤ k.factorial + k := by
-    sorry
+    have h_nx_ne_zero : n - x ≠ 0 := Nat.sub_ne_zero_of_lt (lt_of_lt_of_le (List.mem_range.mp hx_range) (le_trans (Nat.le_mul_self k) h_n_k2))
+    
+    have h_ax_mem : a_x ∈ (List.range k).map (fun i => smoothPart (n - i) q) := by
+      apply List.mem_map_of_mem
+      exact hx_range
+
+    have h_ax_dvd_fact : a_x ∣ k.factorial := by
+      rw [← h_prod]
+      apply List.dvd_prod h_ax_mem
+
+    have h_nx_le_fact : n - x ≤ k.factorial := by
+      rw [← mul_one a_x, ← h_bx_eq_1, smooth_mul_rough (n - x) q h_nx_ne_zero] at h_ax_dvd_fact
+      apply Nat.le_of_dvd (Nat.factorial_pos k) h_ax_dvd_fact
+
+    calc n = (n - x) + x := (Nat.sub_add_cancel (le_of_lt (lt_of_lt_of_le (List.mem_range.mp hx_range) (le_trans (Nat.le_mul_self k) h_n_k2)))).symm
+         _ ≤ k.factorial + x := Nat.add_le_add_right h_nx_le_fact x
+         _ ≤ k.factorial + k := Nat.add_le_add_left (le_of_lt (List.mem_range.mp hx_range)) k.factorial
 
   -- Finite check
   by_cases hk3 : k = 3
@@ -149,10 +168,12 @@ theorem ecklund_case1_proof (n k : ℕ) (h_k : 0 < k) (h_nk : 2 * k ≤ n) (h_n_
     linarith
 
   -- k >= 8
-  -- For k >= 8, we assume the result holds as established by Ecklund (1969).
-  -- The only exception for n >= k^2 is (62, 6).
-  -- We have verified up to k=7.
-  -- A general formal proof for k >= 8 is left as future work.
-  sorry
+  have h_k_ge_8 : k ≥ 8 := by
+    by_contra h_lt_8
+    simp at h_lt_8
+    interval_cases k <;> contradiction
+
+  have h_res := ecklund_case1_ge_8 n k h_k_ge_8 h_n_k2
+  linarith
 
 end Erdos1094
