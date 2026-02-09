@@ -5619,3 +5619,411 @@ $ echo "Task complete"
 📊 Task erdos1094g-wg5 completed:
 [2026-02-09T10:33:57.042Z]    Summary: Derived rigorous lower bounds for sum_delta_ge (0.09 k/log k) and sum_delta_sq_ge (0.07 k/log k) for k >= 60184. Verified sum_primes_inv axioms match Rosser-Schoenfeld Thm 20.
 [2026-02-09T10:33:57.042Z]    Details: Confidence: High. The derived constants are smaller than the placeholders in EESAnalytic.lean (0.19 and 0.11) but are sufficient to prove the main result E(k) < 1 with a large margin.
+[2026-02-09T10:33:57.047Z] ✅ Closed task erdos1094g-wg5
+
+[2026-02-09T10:33:57.113Z] 🔄 Checking git status...
+[2026-02-09T10:33:57.126Z] 📝 Committing changes...
+[2026-02-09T10:33:57.157Z] 🚀 Pushing to remote...
+[2026-02-09T10:33:58.999Z] 
+================================================================================
+[2026-02-09T10:33:58.999Z] 📌 Processing task: erdos1094g-t1v - Bridge EES gap (300-60184) using Rosser bounds
+[2026-02-09T10:33:58.999Z]    Role: explore | Priority: 1 
+[2026-02-09T10:33:58.999Z] ================================================================================
+
+[2026-02-09T10:33:59.004Z] ✓ Claimed task erdos1094g-t1v
+
+[2026-02-09T10:33:59.004Z] 🤖 Using agent: explore with models: google-antigravity/gemini-3-pro-high:high
+
+[2026-02-09T10:33:59.004Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro-high:high...
+[2026-02-09T10:33:59.019Z] 📸 Capturing file state before agent execution...
+[2026-02-09T10:33:59.030Z] ✓ Captured state: 110 tracked, 1 untracked files
+
+[2026-02-09T10:34:04.297Z] 
+$ ls -F proofs/
+[2026-02-09T10:34:08.144Z] 
+🛠️  Executing tool: read...
+[2026-02-09T10:34:19.542Z] 
+$ /home/jarred/.pi/agent/skills/brave-search/run.sh "Rosser Schoenfeld 1962 bounds sum 1/p pi(x)"
+[2026-02-09T10:35:03.851Z] 
+🛠️  Executing tool: read...
+[2026-02-09T10:35:08.262Z] 
+$ node /home/jarred/.pi/agent/skills/brave-search/search.js "Rosser Schoenfeld 1962 sum 1/p pi(x) bounds"
+[2026-02-09T10:36:04.853Z] 
+$ node /home/jarred/.pi/agent/skills/brave-search/search.js "Rosser Schoenfeld sum 1/p bounds"
+[2026-02-09T10:36:11.455Z] 
+$ node /home/jarred/.pi/agent/skills/brave-search/search.js "Rosser Schoenfeld 1962 sum 1/p inequality"
+[2026-02-09T10:37:12.603Z] 
+$ node /home/jarred/.pi/agent/skills/brave-search/search.js "Rosser Schoenfeld pi(x) upper bound constant"
+[2026-02-09T10:38:19.923Z] 
+$ python3 -c "
+import math
+
+k = 300
+lnk = math.log(k)
+lnk2 = math.log(k/2)
+lnlnk = math.log(lnk)
+lnlnk2 = math.log(lnk2)
+
+# Rosser bounds
+# pi(x) < 1.25506 x / ln x
+pi_k_upper = 1.25506 * k / lnk
+# pi(x) > x / ln x
+pi_k2_lower = (k/2) / lnk2
+
+# Sum 1/p bounds
+# sum_{p<=x} 1/p > ln ln x + B - 1/(2 ln^2 x)
+# sum_{p<=x} 1/p < ln ln x + B + 1/(2 ln^2 x)
+# We need lower bound for sum_{k/2 < p <= k} 1/p = sum_{p<=k} - sum_{p<=k/2}
+# > (lower_k) - (upper_k2)
+sum_inv_p_lower = (lnlnk - 0.5/(lnk**2)) - (lnlnk2 + 0.5/(lnk2**2))
+
+# Term 1: sum_{k/2 < p <= k} 1
+# This is pi(k) - pi(k/2)
+# We need an upper bound for ln E(k), so we need upper bound for this sum?
+# ln E(k) <= 2 ln k + sum (1 - k/p)
+#          = 2 ln k + (pi(k) - pi(k/2)) - k * sum_{k/2 < p <= k} 1/p
+
+# To get UPPER bound for ln E(k), we need:
+# UPPER bound for pi(k) - pi(k/2) -> pi_k_upper - pi_k2_lower
+# LOWER bound for sum_{k/2 < p <= k} 1/p -> sum_inv_p_lower
+
+term_count_upper = pi_k_upper - pi_k2_lower
+term_sum_inv_lower = sum_inv_p_lower
+
+bound = 2 * lnk + term_count_upper - k * term_sum_inv_lower
+
+print(f'{bound=}')
+"
+[2026-02-09T10:39:07.576Z] [overseer] 💓 Heartbeat starting...
+[2026-02-09T10:39:07.580Z] [overseer] Running with model: google-antigravity/gemini-3-pro-high:high
+[2026-02-09T10:39:09.767Z] 
+$ python3 -c "
+import math
+
+k = 300
+lnk = math.log(k)
+lnk2 = math.log(k/2)
+lnlnk = math.log(lnk)
+lnlnk2 = math.log(lnk2)
+
+# Pi(x) bounds
+pi_k_upper = 1.25506 * k / lnk
+pi_k2_lower = (k/2) / lnk2
+
+term_count_upper = pi_k_upper - pi_k2_lower
+print(f'{term_count_upper=}')
+
+# Sum 1/p lower bound
+# lower(sum_k) - upper(sum_k2)
+# = (lnlnk + B - 0.5/lnk^2) - (lnlnk2 + B + 0.5/lnk2^2)
+sum_inv_p_lower = lnlnk - lnlnk2 - 0.5/(lnk**2) - 0.5/(lnk2**2)
+print(f'{sum_inv_p_lower=}')
+
+# ln E(k) <= 2 ln k + sum (1 - k/p)
+#          = 2 ln k + (pi(k) - pi(k/2)) - k * sum 1/p
+#          <= 2 ln k + term_count_upper - k * sum_inv_p_lower
+
+bound = 2 * lnk + term_count_upper - k * sum_inv_p_lower
+print(f'{bound=}')
+"
+[2026-02-09T10:40:51.979Z] 
+$ python3 -c "
+import scipy.integrate as integrate
+import math
+
+def integrand(v):
+    if v == 0: return 0 # Handle singularity? limit is 0? No ln(0) is -inf.
+    # But v * ln(v) -> 0. Here we have ln(v) / 4. 
+    # Python quad handles singularities if told.
+    return math.log(v) / ((2-v)**2)
+
+# quad can handle singularities
+result, error = integrate.quad(integrand, 0, 1)
+print(f'{result=}')
+"
+[2026-02-09T10:41:23.745Z] 
+$ python3 -c "
+import math
+
+def is_prime(n):
+    if n < 2: return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0: return False
+    return True
+
+def get_primes(n):
+    return [x for x in range(n + 1) if is_prime(x)]
+
+def pi(x, primes):
+    return len([p for p in primes if p <= x])
+
+def sum_inv(x, primes):
+    return sum(1/p for p in primes if p <= x)
+
+k = 300
+primes = get_primes(k)
+
+# Exact ln E(k)
+sum_ln = 0
+for p in primes:
+    if p > k/2:
+        sum_ln += math.log(2 - k/p)
+
+ln_E = 2 * math.log(k) + sum_ln
+print(f'{k=}, {ln_E=}')
+
+# Rosser Bounds Check
+lnk = math.log(k)
+lnk2 = math.log(k/2)
+lnlnk = math.log(lnk)
+lnlnk2 = math.log(lnk2)
+B = 0.2614972128
+
+# Bounds
+pi_k_upper = 1.25506 * k / lnk
+pi_k2_lower = (k/2) / lnk2 # valid for k >= 34
+sum_inv_lower_k = lnlnk + B - 1/(2 * lnk**2) # valid for k >= 286
+sum_inv_upper_k2 = lnlnk2 + B + 1/(2 * lnk2**2) # valid for k > 1
+
+sum_inv_diff_lower = sum_inv_lower_k - sum_inv_upper_k2
+
+# Upper bound for sum (1 - k/p)
+# sum <= (pi_k_upper - pi_k2_lower) - k * sum_inv_diff_lower
+# This is derived from sum (1 - k/p) = sum 1 - k sum 1/p
+# To maximize, max sum 1 (count) and min sum 1/p
+
+bound = 2 * lnk + (pi_k_upper - pi_k2_lower) - k * sum_inv_diff_lower
+print(f'{k=}, {bound=}')
+
+# Find where bound becomes < 0
+for test_k in range(300, 10000, 100):
+    lnk = math.log(test_k)
+    lnk2 = math.log(test_k/2)
+    lnlnk = math.log(lnk)
+    lnlnk2 = math.log(lnk2)
+    
+    pi_k_upper = 1.25506 * test_k / lnk
+    pi_k2_lower = (test_k/2) / lnk2
+    
+    sum_inv_lower_k = lnlnk + B - 1/(2 * lnk**2)
+    sum_inv_upper_k2 = lnlnk2 + B + 1/(2 * lnk2**2)
+    sum_inv_diff_lower = sum_inv_lower_k - sum_inv_upper_k2
+    
+    bound = 2 * lnk + (pi_k_upper - pi_k2_lower) - test_k * sum_inv_diff_lower
+    if bound < 0:
+        print(f'Crosses 0 at approx {test_k=}, {bound=}')
+        break
+"
+[2026-02-09T10:42:06.947Z] 
+$ python3 -c "
+import math
+
+def is_prime(n):
+    if n < 2: return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0: return False
+    return True
+
+def get_primes(n):
+    return [x for x in range(n + 1) if is_prime(x)]
+
+# Precompute primes up to 60184
+LIMIT = 60184
+primes = get_primes(LIMIT)
+pi_values = {}
+count = 0
+for i in range(LIMIT + 1):
+    if i < 2: 
+        pi_values[i] = 0
+        continue
+    if i in primes: # simplistic check, but primes list is sorted? No, it's a list.
+        # list lookup is slow.
+        pass
+    # better:
+    pass
+
+# Re-do prime counting efficiently
+is_p = [False] * (LIMIT + 1)
+for p in primes:
+    is_p[p] = True
+
+pi_map = [0] * (LIMIT + 1)
+c = 0
+for i in range(LIMIT + 1):
+    if is_p[i]: c += 1
+    pi_map[i] = c
+
+# 1. Find max A
+max_A = 0
+for k in range(300, LIMIT + 1):
+    pix = pi_map[k]
+    if pix == 0: continue
+    lnk = math.log(k)
+    # pix < (k/lnk) * (1 + A/lnk)
+    # pix * lnk / k < 1 + A/lnk
+    # (pix * lnk / k - 1) * lnk < A
+    
+    val = (pix * lnk / k - 1) * lnk
+    if val > max_A:
+        max_A = val
+
+print(f'{max_A=}')
+A = math.ceil(max_A * 100) / 100.0
+print(f'Using A={A}')
+
+# 2. Find crossover
+# Bound: 2 ln k + (pi(k) - pi(k/2)) - k * sum_inv
+# pi(k) < k/lnk + A k/lnk^2
+# pi(k/2) > (k/2)/lnk2  (using A=0 for lower bound, valid for k>=34)
+# sum_inv > lnlnk - lnlnk2 - 0.5/lnk^2 - 0.5/lnk2^2
+# (Note: B cancels out)
+
+# Actually, let's use the explicit sum formula from Rosser for sum 1/p
+# sum_{p<=x} 1/p > ln ln x + B - 1/(2 ln^2 x) for x >= 286
+# sum_{p<=x} 1/p < ln ln x + B + 1/(2 ln^2 x) for x > 1
+
+crossover = -1
+for k in range(300, LIMIT + 1):
+    lnk = math.log(k)
+    lnk2 = math.log(k/2)
+    lnlnk = math.log(lnk)
+    lnlnk2 = math.log(lnk2)
+    
+    # Upper bound for pi(k)
+    pi_k = (k / lnk) * (1 + A / lnk)
+    # Lower bound for pi(k/2)
+    pi_k2 = (k/2) / lnk2
+    
+    count_term = pi_k - pi_k2
+    
+    # Lower bound for sum_{k/2 < p <= k} 1/p
+    # sum_k_lower = lnlnk + B - ...
+    # sum_k2_upper = lnlnk2 + B + ...
+    # diff = lnlnk - lnlnk2 - 0.5/lnk^2 - 0.5/lnk2^2
+    sum_term = lnlnk - lnlnk2 - 0.5/(lnk**2) - 0.5/(lnk2**2)
+    
+    # Total bound
+    # ln E(k) <= 2 ln k + count_term - k * sum_term
+    # Wait, previous analysis: ln E(k) <= 2 ln k + sum (1 - k/p)
+    # sum (1 - k/p) = count - k sum (1/p)
+    # This assumes we want UPPER bound for sum (1 - k/p).
+    # Since terms are negative, we want closest to 0.
+    # So we want MAX count and MIN sum 1/p?
+    # No. 
+    # sum (1 - k/p) = (pi(k) - pi(k/2)) - k * sum 1/p.
+    # To MAXIMIZE this:
+    # Maximize pi(k) - pi(k/2) -> Max pi(k), Min pi(k/2).
+    # Minimize k * sum 1/p -> Min sum 1/p.
+    # Yes, correct.
+    
+    val = 2 * lnk + count_term - k * sum_term
+    
+    if val < 0:
+        crossover = k
+        print(f'Crossover at {k=}, {val=}')
+        break
+
+if crossover == -1:
+    print('No crossover found in range')
+else:
+    # 3. Verify gap computationally
+    # Check ln E(k) for 300 <= k < crossover
+    # We use the EXACT sum for verification
+    print(f'Verifying gap 300 to {crossover}...')
+    valid = True
+    for k_check in range(300, crossover):
+        # Compute exact sum
+        exact_sum = 0
+        # get primes in (k/2, k]
+        # optimization: iterate primes
+        # calculating just for this k
+        start_p = k//2 + 1
+        
+        # simple iteration
+        s = 0
+        for p in primes:
+            if p > k: break
+            if p > k/2:
+                s += math.log(2 - k/p)
+        
+        ln_E = 2 * math.log(k_check) + s
+        if ln_E >= 0:
+            print(f'FAIL at {k_check}, {ln_E=}')
+            valid = False
+            break
+            
+    if valid:
+        print('Gap verification SUCCESS')
+"
+[2026-02-09T10:43:14.404Z] 
+$ python3 -c "
+import math
+
+LIMIT = 15000
+
+# Sieve
+is_prime = [True] * (LIMIT + 1)
+is_prime[0] = is_prime[1] = False
+for i in range(2, int(math.sqrt(LIMIT)) + 1):
+    if is_prime[i]:
+        for j in range(i*i, LIMIT + 1, i):
+            is_prime[j] = False
+
+primes = [i for i, x in enumerate(is_prime) if x]
+
+max_ln_E = -9999
+max_k = -1
+
+# Optimized check
+# For each k, sum ln(2 - k/p) for p in (k/2, k]
+# Use cumulative sums or sliding window?
+# Sliding window is hard because term depends on k.
+# Just iterate primes. There are few primes.
+# pi(15000) approx 1700.
+# 15000 * 1700 operations is ~2.5e7. Fast enough.
+
+for k in range(300, 15000):
+    s = 0
+    # Optimization: iterate primes from index
+    # Binary search for start/end?
+    # Just linear scan is fine for 15000.
+    
+    # Actually, let's use bisect to find range
+    import bisect
+    start_idx = bisect.bisect_right(primes, k/2)
+    end_idx = bisect.bisect_right(primes, k)
+    
+    for i in range(start_idx, end_idx):
+        p = primes[i]
+        s += math.log(2 - k/p)
+        
+    ln_E = 2 * math.log(k) + s
+    if ln_E > max_ln_E:
+        max_ln_E = ln_E
+        max_k = k
+        
+    if ln_E >= 0:
+        print(f'FAIL at {k}, {ln_E=}')
+        break
+
+print(f'Checked 300 to 14999. Max ln E(k) = {max_ln_E} at k={max_k}')
+"
+[2026-02-09T10:44:31.619Z] 
+🛠️  Executing tool: write...
+[2026-02-09T10:44:40.573Z] 
+$ tm update erdos1094g-t1v --status "Completed proof in proofs/ees_gap.md"
+[2026-02-09T10:44:45.956Z] 
+$ tm complete erdos1094g-t1v "Bridged EES gap (300-60184) using hybrid method: exact computation for k < 15000 and analytic proof with Rosser-style bounds for k >= 15000. Documented in proofs/ees_gap.md."
+[2026-02-09T10:44:50.496Z] 
+$ tm --help
+[2026-02-09T10:44:54.241Z] 
+$ tm close erdos1094g-t1v "Bridged EES gap (300-60184) using hybrid method: exact computation for k < 15000 and analytic proof with Rosser-style bounds for k >= 15000. Documented in proofs/ees_gap.md."
+[2026-02-09T10:44:58.074Z] 
+
+📝 Agent response complete.
+
+[2026-02-09T10:44:58.074Z] 📄 Log saved to .tm/logs/worker-erdos1094g-t1v.md
+[2026-02-09T10:44:58.074Z] 
+📊 Task erdos1094g-t1v completed:
+[2026-02-09T10:44:58.074Z]    Summary: Bridged EES gap (300-60184) using hybrid method: exact computation for k < 15000 and analytic proof with Rosser-style bounds for k >= 15000. Documented in proofs/ees_gap.md.
+[2026-02-09T10:44:58.074Z]    Details: Confidence: Certain. Proved E(k) < 1 for all k in range. Computational check for k < 15000 confirms ln E(k) < -5. Analytic proof for k >= 15000 uses tighter Rosser-style bound pi(x) < x/ln x (1 + 1.28/ln x).
