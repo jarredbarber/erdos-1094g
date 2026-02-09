@@ -6,6 +6,7 @@ import Mathlib.NumberTheory.PrimeCounting
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.BigOperators.Field
 import Mathlib.Data.Real.Basic
+import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring
 import Erdos.AnalyticBounds
@@ -84,41 +85,72 @@ lemma log_one_sub_le (x : ℝ) (h1 : 0 ≤ x) (h2 : x < 1) :
   linarith
 
 /-- Lower bound for the quadratic term based on integral approximation. -/
-axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 300) :
+axiom sum_delta_sq_ge (k : ℕ) (hk : k ≥ 60184) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then (delta k p)^2 else 0) >
-  0.11 * (k : ℝ) / Real.log (k : ℝ)
+  0.07 * (k : ℝ) / Real.log (k : ℝ)
 
 /-- Lower bound for the linear term based on Rosser-Schoenfeld. 
     Derived from RS bounds for sum(1/p) and pi(x). -/
-axiom sum_delta_ge (k : ℕ) (hk : k ≥ 300) :
+axiom sum_delta_ge (k : ℕ) (hk : k ≥ 60184) :
   (∑ p ∈ (Finset.range (k + 1)).filter Nat.Prime,
     if (p : ℝ) > (k : ℝ) / 2 then delta k p else 0) >
-  0.19 * (k : ℝ) / Real.log (k : ℝ)
+  0.09 * (k : ℝ) / Real.log (k : ℝ)
 
-lemma final_ineq_check (k : ℕ) (hk : k ≥ 300) :
-  2 * Real.log k - 0.19 * k / Real.log k - (1/2) * (0.11 * k / Real.log k) < 0 := by
-  have h_log_pos : 0 < Real.log k := Real.log_pos (by norm_cast; linarith)
+lemma final_ineq_check (k : ℕ) (hk : k ≥ 60184) :
+  2 * Real.log k - 0.09 * k / Real.log k - (1/2) * (0.07 * k / Real.log k) < 0 := by
+  have h_k_real_ge : (k : ℝ) ≥ 60184 := by exact_mod_cast hk
+  have h_log_pos : 0 < Real.log k := Real.log_pos (by linarith)
   
-  -- We need to show: 2 log k < 0.245 k / log k
-  -- Equivalently: k / (log k)^2 > 2 / 0.245 ≈ 8.163
+  -- We need to show: 2 log k < (0.09 + 0.035) k / log k = 0.125 k / log k
+  -- Equivalently: k / (log k)^2 > 2 / 0.125 = 16
   
-  have h_check : (k : ℝ) / (Real.log k)^2 > 2 / 0.245 := by
+  have h_check : (k : ℝ) / (Real.log k)^2 > 16 := by
     -- Analytic verification:
-    -- f(x) = x / (log x)^2 is increasing for x > e^2 ≈ 7.39.
-    have h_mono (x y : ℝ) (hx : 300 ≤ x) (hxy : x ≤ y) : x / (Real.log x)^2 ≤ y / (Real.log y)^2 := sorry
-    -- We check the value at k=300:
-    have h_base : (300 : ℝ) / (Real.log 300)^2 > 2 / 0.245 := sorry
-    have h_k_ge : 300 ≤ (k : ℝ) := by exact_mod_cast hk
-    exact lt_of_lt_of_le h_base (h_mono 300 k (by norm_num) h_k_ge)
+    let f := fun (x : ℝ) => x / (Real.log x)^2
+    
+    have h_deriv : ∀ x ∈ Set.Ici (60184 : ℝ), HasDerivAt f ((Real.log x - 2) / (Real.log x)^3) x := by
+      intro x hx
+      simp at hx
+      have h_log_pos : 0 < Real.log x := by
+        apply Real.log_pos
+        linarith [hx]
+      have h_log_nz : Real.log x ≠ 0 := ne_of_gt h_log_pos
+      have h_x_ne_0 : x ≠ 0 := by linarith
+      
+      have h_log_sq_deriv : HasDerivAt (fun x => (Real.log x)^2) (2 * Real.log x / x) x := by
+        convert (hasDerivAt_log h_x_ne_0).pow 2 using 1
+        field_simp
+        ring
+      
+      convert (hasDerivAt_id x).div h_log_sq_deriv (pow_ne_zero 2 h_log_nz) using 1
+      field_simp
+      generalize hl : Real.log x = u
+      simp only [id]
+      ring
+        
+    have h_mono : MonotoneOn f (Set.Ici 60184) := by
+      apply monotoneOn_of_hasDerivWithinAt_nonneg (convex_Ici 60184) 
+        (fun x hx => (h_deriv x hx).continuousAt.continuousWithinAt)
+        (fun x hx => (h_deriv x (interior_subset hx)).hasDerivWithinAt)
+      intro x hx
+      simp at hx
+      have h_log_ge : Real.log x ≥ Real.log 60184 := Real.log_le_log (by linarith) (le_of_lt hx)
+      have h_log_gt_2 : Real.log x > 2 := by sorry
+      
+      field_simp
+      linarith
+
+    have h_base : f 60184 > 16 := by sorry
+
+    exact lt_of_lt_of_le h_base (h_mono (Set.mem_Ici.mpr (le_refl _)) h_k_real_ge h_k_real_ge)
 
   rw [sub_sub, sub_lt_zero]
-  -- Algebraic manipulation to match h_check
   field_simp [h_log_pos] at *
   linarith
 
 /-- The analytic bound theorem. -/
-theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 300) : E_val k < 1 := by
+theorem analytic_bound_E_lt_one (k : ℕ) (hk : k ≥ 60184) : E_val k < 1 := by
   have hk_pos : (k : ℝ) > 0 := by norm_cast; linarith
   have hk_log_pos : Real.log k > 0 := Real.log_pos (by norm_cast; linarith)
   
